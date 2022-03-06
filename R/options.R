@@ -14,3 +14,7 @@
 #-------Analyses options---------
 res = 1
 n_species = 1000
+disp_cap = c("good_disp", "poor_disp")
+good_disp = 4
+poor_disp = 2
+burn_in = 1000
