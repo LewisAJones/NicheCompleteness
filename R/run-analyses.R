@@ -12,3 +12,19 @@
 ## Email: LewisA.Jones@outlook.com
 ##
 #---------Analyses-----------
+
+#prepare climate data
+source("./R/subscripts/prepare-climate-data.R")
+rm(list = ls())
+
+#create sampling windows
+source("./R/subscripts/sampling-window.R")
+rm(list = ls())
+
+#generate virtual species
+source("./R/subscripts/virtual-species.R")
+rm(list = ls())
+
+#sample species' distributions
+source("./R/subscripts/sample-data.R")
+rm(list = ls())

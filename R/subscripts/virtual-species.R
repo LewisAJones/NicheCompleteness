@@ -18,8 +18,6 @@ library(pbmcapply)
 source("./R/options.R")
 #plot outputs
 pl = FALSE
-n_species = 10
-burn_in = 100
 #-----------Analyses--------------
 #intervals for analyses
 intervals <- c("sant", "camp", "maas")
@@ -112,7 +110,7 @@ for(int in intervals){
     
     #save data
     saveRDS(random.sp, paste0("./results/virtual-species/", int, "/species-", n, ".RDS"))
-  }, mc.cores = detectCores()-1, mc.preschedule = T, mc.cleanup = T) #for parallel processing
+  }, mc.cores = detectCores()-1, mc.preschedule = FALSE, mc.cleanup = TRUE) #for parallel processing
 }
 
 #record end time
