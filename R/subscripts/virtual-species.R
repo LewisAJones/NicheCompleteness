@@ -21,7 +21,7 @@ pl = FALSE
 #-----------Analyses--------------
 #intervals for analyses
 intervals <- c("sant", "camp", "maas")
-
+intervals <- c("sant")
 #run for loop across intervals
 for(int in intervals){
   
@@ -30,27 +30,36 @@ for(int in intervals){
 
   #stack rasters
   stk <- stack(files)
-
+  
+  #define original CRS
+  crs(stk) <- prj
+  
   #record start time
   startTime <- Sys.time()
 
   virtual_species <- pbmclapply(1:n_species, function(n){
-    
+
     #generate random species
-    random.sp <- generateRandomSp(raster.stack = stk,
-                                  approach = "response",
-                                  relations = "gaussian",
-                                  realistic.sp = TRUE,
-                                  species.type = "multiplicative",
-                                  rescale.each.response = TRUE,
-                                  convert.to.PA = TRUE,
-                                  PA.method = "threshold",
-                                  beta = 0.5,
-                                  plot = pl
-                                  )
-    
+    exist <- 0
+    #if species cannot exist due to lack of suitability within environment, rerun prior function
+    while(exist == 0){
+      random.sp <- generateRandomSp(raster.stack = stk,
+                                    approach = "response",
+                                    relations = "gaussian",
+                                    realistic.sp = TRUE,
+                                    species.type = "multiplicative",
+                                    rescale.each.response = TRUE,
+                                    convert.to.PA = TRUE,
+                                    PA.method = "threshold",
+                                    beta = 0.5,
+                                    plot = pl
+                                    )
+      vals <- getValues(random.sp$pa.raster)
+      vals <- na.omit(vals)
+        if(length(vals) > 0){exist <- 1}
+    }
     #sample origin occurrence from random species
-    random.sp$origin <- sampleOccurrences(x = random.sp, n = 1, plot = pl)$sample.points[c("x", "y")]
+    random.sp$origin <- sampleOccurrences(x = random.sp, n = 1, plot = pl, replacement = TRUE)$sample.points[c("x", "y")]
     
     #generate raster of species origin
     r_origin <- random.sp$pa.raster
@@ -58,7 +67,7 @@ for(int in intervals){
     r_origin[cellFromXY(object = r_origin, xy = random.sp$origin)] <- 1
     
     #dispersal capacity (randomly sample from good vs poor dispersal)
-    random.sp$dispersal_cap <- sample(x = disp_cap, size = 1)
+    random.sp$dispersal_cap <- sample(x = disp_cap, size = 1, replace = TRUE)
     
     #exploration stage (sample from potential options)
     #generate d for good dispersal capacity
@@ -69,7 +78,7 @@ for(int in intervals){
     if(random.sp$dispersal_cap == "poor_disp"){
       d <- sample(x = seq(0, poor_disp, 1), size = burn_in, replace = TRUE, prob = dgeom(x = seq(0, poor_disp, 1), prob = 0.8))
     }
-    
+
     #dispersal simulation stage
     for(i in 1:burn_in){
       

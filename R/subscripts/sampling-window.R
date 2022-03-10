@@ -26,7 +26,7 @@ collections$mid_ma <- (collections$max_ma+collections$min_ma)/2
 #max and min ages of Santonian, Campanian and Maastrichtian
 max_ma <- c(86.3, 83.6, 72.1)
 min_ma <- c(83.6, 72.1, 66)
-intervals <- c("Sant", "Camp", "Maas")
+intervals <- c("sant", "camp", "maas")
 #assign interval
 collections$interval <- NA
 collections[which(collections$mid_ma > min_ma[1] & collections$mid_ma < max_ma[1]),c("interval")] <- intervals[1]
@@ -39,9 +39,9 @@ collections <- collections[,c("lng", "lat", "interval")]
 collections <- unique(collections)
 #add age of climate simulation for rotating data
 collections$rot_age <- NA
-collections[which(collections$interval == "Sant"),c("rot_age")] <- 86.7
-collections[which(collections$interval == "Camp"),c("rot_age")] <- 80.8
-collections[which(collections$interval == "Maas"),c("rot_age")] <- 69.0
+collections[which(collections$interval == "sant"),c("rot_age")] <- 86.7
+collections[which(collections$interval == "camp"),c("rot_age")] <- 80.8
+collections[which(collections$interval == "maas"),c("rot_age")] <- 69.0
 #-----------Rotate data--------------
 #get plate rotation model
 pm <- fetch("paleomap", "model", datadir = "./data/raw-data/rot-model/")
@@ -62,9 +62,11 @@ for(i in intervals){
   r <- raster(res = res)
   #rasterize sampling window data
   r <- rasterize(x = sampling_window, y = r)
+  #define original CRS
+  crs(r) <- prj
   #save xy data
   saveRDS(sampling_window, paste0("./results/sampling-window/xy_coords_", i, ".RDS"))
   #save raster data
-  writeRaster(r, paste0("./results/sampling-window/sampling_raster_", i, ".asc"), overwrite = TRUE)
+  writeRaster(r, paste0("./results/sampling-window/sampling_raster_", i, ".grd"), overwrite = TRUE)
 }
 

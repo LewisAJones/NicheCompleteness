@@ -19,11 +19,11 @@ source("./R/options.R")
 intervals <- c("sant", "camp", "maas")
 
 #sampling windows
-sant_samp <- raster("./results/sampling-window/sampling_raster_Sant.asc")
+sant_samp <- raster("./results/sampling-window/sampling_raster_sant.grd")
 sant_samp[sant_samp < 1] <- NA
-camp_samp <- raster("./results/sampling-window/sampling_raster_Camp.asc")
+camp_samp <- raster("./results/sampling-window/sampling_raster_camp.grd")
 camp_samp[camp_samp < 1] <- NA
-maas_samp <- raster("./results/sampling-window/sampling_raster_Maas.asc")
+maas_samp <- raster("./results/sampling-window/sampling_raster_maas.grd")
 maas_samp[maas_samp < 1] <- NA
 
 #species files
@@ -78,7 +78,7 @@ for(i in maas_files){
   #add to species object
   if(nrow(xy)==0){df$sampled_distribution <- c("No sampled data")
   n <- n + 1}
-  else{df$sampled_distribution <- xy}
+  else{df$sampled_distribution <- xy[,c("x", "y")]}
   saveRDS(df, i)
 }
 #-----------Finish--------------
