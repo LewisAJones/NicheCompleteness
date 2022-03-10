@@ -24,9 +24,12 @@ maas_files <- list.files("./results/virtual-species/maas/", full.names = TRUE)
 #-----------Santonian--------------
 #get file paths
 files <- list.files("./data/climate/sant/", full.names = TRUE)
-  
+
 #stack rasters
 stk <- stack(files)
+
+#generate empty dataframe
+master <- data.frame()
 
 for(i in sant_files){
   #load data
@@ -34,7 +37,10 @@ for(i in sant_files){
   
   #next file if no sampled data exists
   if(df$sampled_distribution == "No sampled data"){next}
-  if(nrow(df$sampled_distribution) == 1){next}
+  
+  #minimum of five points needed for ecospat function
+  if(nrow(df$sampled_distribution) < 5){next}
+
   #extract climate data for whole study area
   df$env <- na.omit(data.frame(getValues(stk)))
   #extract climate data to points for full distribution
@@ -43,56 +49,50 @@ for(i in sant_files){
   df$sampled_env <- extract(x = stk, y = df$sampled_distribution[,c("x", "y")])
   
   #compute PCA for whole study area
-  #pca.env <- dudi.pca(df$env, scannf=FALSE, nf=2)
+  pca.env <- dudi.pca(df$env, scannf=FALSE, nf=2)
   
   #plot PCA
   #ecospat.plot.contrib(contrib=pca.env$co, eigen=pca.env$eig)
   
   # PCA scores for the whole study area
-  scores.globclim <- dudi.pca(df$env, center = TRUE, scale = TRUE, scannf=FALSE, nf=2)$li
+  scores.globclim <- pca.env$li
+  
+  #add full distribution
+  scores.full <- suprow(pca.env,df$full_env)$li
 
-  #compute PCA scores for full distribution
-  scores.full <- dudi.pca(df$full_env, center = TRUE, scale = TRUE, scannf=FALSE, nf=2)$li
-
-  #compute PCA scores for sampled distribution
-  scores.sampled <- dudi.pca(df$sampled_env, center = TRUE, scale = TRUE, scannf=FALSE, nf=2)$li
+  #add sampled distribution
+  scores.sampled <- suprow(pca.env,df$sampled_env)$li
+  
+  #add all data for full distribution
+  scores.clim.full <- suprow(pca.env,df$env)$li
+  
+  # PCA scores for the whole invaded study area
+  scores.clim.samp <- suprow(pca.env,df$env)$li
   
   #grid full distribution niche
   grid.clim.full <- ecospat.grid.clim.dyn(glob=scores.globclim,
-                                         glob1=scores.globclim,
+                                         glob1=scores.clim.full,
                                          sp=scores.full, R=100,
                                          th.sp = 0)
   
   #grid sampled distribution niche
   grid.clim.samp <- ecospat.grid.clim.dyn(glob=scores.globclim,
-                                         glob1=scores.globclim,
+                                         glob1=scores.clim.samp,
                                          sp=scores.sampled, R=100,
                                          th.sp=0)
   
   #quantify niche dynamics
-  niche.dyn <- ecospat.niche.dyn.index (grid.clim.full, grid.clim.samp, intersection = 0.1)
-}
+  niche.dyn <- ecospat.niche.dyn.index(grid.clim.full, grid.clim.samp, intersection = 0)
+
+  #extract niche dynamics metric
+  df <- t(data.frame(niche.dyn$dynamic.index.w))
   
-
-
-inv <- ecospat.testNiche.inv
-nat <- ecospat.testNiche.nat
-pca.env <- dudi.pca(rbind(nat,inv)[,3:10],scannf=F,nf=2)
-ecospat.plot.contrib(contrib=pca.env$co, eigen=pca.env$eig)
-# PCA scores for the whole study area
-scores.globclim <- pca.env$li
-# PCA scores for the species native distribution
-scores.sp.nat <- suprow(pca.env,nat[which(nat[,11]==1),3:10])$li # PCA scores for the species invasive distribution
-scores.sp.inv <- suprow(pca.env,inv[which(inv[,11]==1),3:10])$li # PCA scores for the whole native study area
-scores.clim.nat <- suprow(pca.env,nat[,3:10])$li
-# PCA scores for the whole invaded study area
-scores.clim.inv <- suprow(pca.env,inv[,3:10])$li
-# gridding the native niche
-grid.clim.nat <- ecospat.grid.clim.dyn(glob=scores.globclim, glob1=scores.clim.nat,
-                                       sp=scores.sp.nat, R=100,
-                                       th.sp=0)
-# gridding the invasive niche
-grid.clim.inv <- ecospat.grid.clim.dyn(glob=scores.globclim, glob1=scores.clim.inv,
-                                       sp=scores.sp.inv, R=100,
-                                       th.sp=0)
+  #add species to row name
+  row.names(df) <- tools::file_path_sans_ext(basename(i))
+  
+  #bind data
+  master <- rbind.data.frame(master, df)
+  #plot
+  #ecospat.plot.niche.dyn(grid.clim.full, grid.clim.samp, quant=0.25, interest=2, title= "Niche Overlap", name.axis1="PC1", name.axis2="PC2")
+}
 
