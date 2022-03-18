@@ -22,7 +22,7 @@ source("./R/subscripts/sampling-window.R")
 rm(list = ls())
 
 #generate virtual species
-source("./R/subscripts/virtual-species.R")
+source("./R/subscripts/virtual-species-random.R")
 rm(list = ls())
 
 #sample species' distributions

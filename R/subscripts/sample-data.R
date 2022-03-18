@@ -20,11 +20,11 @@ intervals <- c("sant", "camp", "maas")
 
 #sampling windows
 sant_samp <- raster("./results/sampling-window/sampling_raster_sant.grd")
-sant_samp[sant_samp < 1] <- NA
+sant_samp[!is.na(sant_samp)] <- 1
 camp_samp <- raster("./results/sampling-window/sampling_raster_camp.grd")
-camp_samp[camp_samp < 1] <- NA
+camp_samp[!is.na(camp_samp)] <- 1
 maas_samp <- raster("./results/sampling-window/sampling_raster_maas.grd")
-maas_samp[maas_samp < 1] <- NA
+maas_samp[!is.na(maas_samp)] <- 1
 
 #species files
 sant_files <- list.files("./results/virtual-species/sant/", full.names = TRUE)

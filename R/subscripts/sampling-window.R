@@ -13,6 +13,7 @@
 ##
 #---------Load packages-----------
 library(dplyr)
+library(sf)
 library(chronosphere)
 source("./R/options.R")
 #-----------Get data--------------
@@ -58,12 +59,15 @@ for(i in intervals){
 
   #convert to dataframe
   sampling_window <- data.frame(sampling_window)
+  #convert to sf
+  sampling_window <- sampling_window %>% 
+    st_as_sf(coords = 1:2, crs = gcrs) %>%
+    st_transform(crs = prj)
   #generate empty raster for desired resolution
-  r <- raster(res = res)
+  r <- raster(res = 1)
+  r <- projectRaster(from = r, crs = prj, res = res)
   #rasterize sampling window data
   r <- rasterize(x = sampling_window, y = r)
-  #define original CRS
-  crs(r) <- prj
   #save xy data
   saveRDS(sampling_window, paste0("./results/sampling-window/xy_coords_", i, ".RDS"))
   #save raster data

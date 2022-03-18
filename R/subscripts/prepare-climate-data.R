@@ -22,7 +22,7 @@ months <- c(tolower(month.abb))
 #extent for cropping
 e <- extent(ex)
 #define raster for resampling
-r <- raster(res = res)
+r <- raster(res = 1)
 #---------Maastrichtian-----------
 #load mask 
 msk <- raster("./data/raw-data/climate/Maastrichtian/teyeo/teyeo.qrparm.mask.nc", varname = "lsm")
@@ -59,8 +59,13 @@ names(stk) <- c("max_precip", "min_precip", "max_temp", "min_temp")
 stk <- rotate(stk)
 #resample data
 stk <- resample(x = stk, y = r)
+#define original GCRS
+crs(stk) <- gcrs
+#project data
+stk <- projectRaster(from = stk, crs = prj, res = res)
+plot(stk)
 #save data
-writeRaster(x = stk, filename = paste0("./data/climate/maas/", names(stk), ".asc"), bylayer = TRUE, overwrite = TRUE)
+writeRaster(x = stk, filename = paste0("./data/climate/maas/", names(stk), ".grd"), bylayer = TRUE, overwrite = TRUE)
 #---------Campanian-----------
 #load mask 
 msk <- raster("./data/raw-data/climate/Campanian/teyeq/teyeq.qrparm.mask.nc", varname = "lsm")
@@ -97,8 +102,13 @@ names(stk) <- c("max_precip", "min_precip", "max_temp", "min_temp")
 stk <- rotate(stk)
 #resample data
 stk <- resample(x = stk, y = r)
+#define original GCRS
+crs(stk) <- gcrs
+#project data
+stk <- projectRaster(from = stk, crs = prj, res = res)
+plot(stk)
 #save data
-writeRaster(x = stk, filename = paste0("./data/climate/camp/", names(stk), ".asc"), bylayer = TRUE, overwrite = TRUE)
+writeRaster(x = stk, filename = paste0("./data/climate/camp/", names(stk), ".grd"), bylayer = TRUE, overwrite = TRUE)
 #---------Santonian-----------
 #load mask 
 msk <- raster("./data/raw-data/climate/Santonian/teyer/teyer.qrparm.mask.nc", varname = "lsm")
@@ -135,7 +145,12 @@ names(stk) <- c("max_precip", "min_precip", "max_temp", "min_temp")
 stk <- rotate(stk)
 #resample data
 stk <- resample(x = stk, y = r)
+#define original GCRS
+crs(stk) <- gcrs
+#project data
+stk <- projectRaster(from = stk, crs = prj, res = res)
+plot(stk)
 #save data
-writeRaster(x = stk, filename = paste0("./data/climate/sant/", names(stk), ".asc"), bylayer = TRUE, overwrite = TRUE)
+writeRaster(x = stk, filename = paste0("./data/climate/sant/", names(stk), ".grd"), bylayer = TRUE, overwrite = TRUE)
 #--------------------
 
