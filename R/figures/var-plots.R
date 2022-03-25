@@ -22,7 +22,6 @@ camp <- stack(list.files(paste0("./data/climate/camp/"), pattern = ".grd", full.
 maas <- stack(list.files(paste0("./data/climate/maas/"), pattern = ".grd", full.names = TRUE))
 
 #----------Santonian--------------
-sant$max_precip[is.na(sant$max_precip)] <- 0
 p1 <- levelplot(sant$max_precip, margin = list(FUN = 'median'), contour=TRUE, 
           main= "Maximum precipitation (mm/day)",
           xlab = "Eastings (m)",
@@ -105,6 +104,3 @@ p4 <- levelplot(maas$min_temp, margin = list(FUN = 'median'), contour=TRUE,
 
 p <- grid.arrange(p1, p2, p3, p4)
 ggsave("./figures/maas_vars.png", p, width = 200, height = 150, units = "mm", scale = 2.5)
-
-
-
