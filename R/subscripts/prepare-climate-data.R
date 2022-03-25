@@ -19,10 +19,8 @@ source("./R/options.R")
 #-----------Data prep-------------
 #get months in lower case for data loading
 months <- c(tolower(month.abb))
-#extent for cropping
-e <- extent(ex)
 #define raster for resampling
-r <- raster(res = 1)
+r <- raster(res = 1, ext = extent(ex))
 #---------Maastrichtian-----------
 #load mask 
 msk <- raster("./data/raw-data/climate/Maastrichtian/teyeo/teyeo.qrparm.mask.nc", varname = "lsm")
@@ -56,7 +54,7 @@ stk <- stack(max_precip, min_precip, max_temp, min_temp)
 #add names
 names(stk) <- c("max_precip", "min_precip", "max_temp", "min_temp")
 #rotate data
-stk <- rotate(stk)
+stk <- raster::rotate(stk)
 #resample data
 stk <- resample(x = stk, y = r)
 #define original GCRS
@@ -99,7 +97,7 @@ stk <- stack(max_precip, min_precip, max_temp, min_temp)
 #add names
 names(stk) <- c("max_precip", "min_precip", "max_temp", "min_temp")
 #rotate data
-stk <- rotate(stk)
+stk <- raster::rotate(stk)
 #resample data
 stk <- resample(x = stk, y = r)
 #define original GCRS
@@ -142,7 +140,7 @@ stk <- stack(max_precip, min_precip, max_temp, min_temp)
 #add names
 names(stk) <- c("max_precip", "min_precip", "max_temp", "min_temp")
 #rotate data
-stk <- rotate(stk)
+stk <- raster::rotate(stk)
 #resample data
 stk <- resample(x = stk, y = r)
 #define original GCRS

@@ -21,10 +21,18 @@ rm(list = ls())
 source("./R/subscripts/sampling-window.R")
 rm(list = ls())
 
-#generate virtual species
-source("./R/subscripts/virtual-species-random.R")
-rm(list = ls())
+#generate virtual species (run on CESGA)
+#source("./R/subscripts/virtual-species-random.R")
+#rm(list = ls())
 
 #sample species' distributions
 source("./R/subscripts/sample-data.R")
+rm(list = ls())
+
+#run ecospat analyses
+source("./R/subscripts/ecospat-analysis.R")
+rm(list = ls())
+
+#run ENMTools analyses
+source("./R/subscripts/ENMTools-analysis.R")
 rm(list = ls())

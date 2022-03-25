@@ -21,7 +21,8 @@ source("./R/options.R")
 #download only includes Santonian-Maastrichtian data
 #download only include N. America data
 #download excludes marine data
-collections <- read.csv("https://paleobiodb.org/data1.2/colls/list.csv?interval=Santonian,Maastrichtian&envtype=!marine&show=loc,timebins,geo")
+collections <- read.csv(
+  "https://paleobiodb.org/data1.2/colls/list.csv?interval=Santonian,Maastrichtian&envtype=!marine&show=loc,timebins,geo")
 #define collection mid age
 collections$mid_ma <- (collections$max_ma+collections$min_ma)/2
 #max and min ages of Santonian, Campanian and Maastrichtian
@@ -64,7 +65,7 @@ for(i in intervals){
     st_as_sf(coords = 1:2, crs = gcrs) %>%
     st_transform(crs = prj)
   #generate empty raster for desired resolution
-  r <- raster(res = 1)
+  r <- raster(res = 1, ext = extent(ex))
   r <- projectRaster(from = r, crs = prj, res = res)
   #rasterize sampling window data
   r <- rasterize(x = sampling_window, y = r)

@@ -1,21 +1,21 @@
 [general]
 creator=R package 'raster'
-created=2022-03-18 15:10:35
+created=2022-03-25 11:31:10
 [georeference]
-nrows=179
-ncols=348
-xmin=-17418892.3574184
-ymin=-8939398.53852842
-xmax=17381107.6425816
-ymax=8960601.46147158
-projection=+proj=eck4 +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs
+nrows=190
+ncols=371
+xmin=-18536282.1083801
+ymin=-9479952.15192635
+xmax=18563717.8916199
+ymax=9520047.84807365
+projection=+proj=moll +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs
 [data]
 datatype=FLT4S
 byteorder=little
 nbands=1
 bandorder=BIL
 categorical=FALSE
-minvalue=-28.925627718919
+minvalue=-33.1656308488013
 maxvalue=37.7705322265625
 nodatavalue=-3.4e+38
 [legend]

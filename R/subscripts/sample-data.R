@@ -13,6 +13,7 @@
 ##
 #---------Load packages-----------
 library(dplyr)
+library(raster)
 source("./R/options.R")
 #-----------Analyses--------------
 #intervals for analyses
@@ -34,6 +35,7 @@ maas_files <- list.files("./results/virtual-species/maas/", full.names = TRUE)
 #counter for how many species unsampled
 n <- 0
 #-----------Santonian--------------
+indx <- vector() #record which samples have been sampled
 for(i in sant_files){
   #load data
   df <- readRDS(i)
@@ -46,41 +48,49 @@ for(i in sant_files){
   #add to species object
   if(nrow(xy)==0){df$sampled_distribution <- c("No sampled data")
   n <- n + 1}
-  else{df$sampled_distribution <- xy}
+  else{df$sampled_distribution <- xy[,c("x", "y")]
+  indx <- append(indx, i)}
   saveRDS(df, i)
 }
+saveRDS(indx, "./results/virtual-species/sampled/sant.RDS")
 #-----------Campanian--------------
+indx <- vector() #record which samples have been sampled
 for(i in camp_files){
   #load data
   df <- readRDS(i)
   #rasterize data for masking
   r <- rasterize(x = df$distribution, y = camp_samp, field = 1)
   #mask data by sampling window
-  r <- mask(x = r, mask = sant_samp)
+  r <- mask(x = r, mask = camp_samp)
   #convert raster to spatial points
   xy <- as.data.frame(rasterToPoints(r))
   #add to species object
   if(nrow(xy)==0){df$sampled_distribution <- c("No sampled data")
   n <- n + 1}
-  else{df$sampled_distribution <- xy}
+  else{df$sampled_distribution <- xy[,c("x", "y")]
+  indx <- append(indx, i)}
   saveRDS(df, i)
 }
+saveRDS(indx, "./results/virtual-species/sampled/camp.RDS")
 #-----------Maastrichtian--------------
+indx <- vector() #record which samples have been sampled
 for(i in maas_files){
   #load data
   df <- readRDS(i)
   #rasterize data for masking
   r <- rasterize(x = df$distribution, y = maas_samp, field = 1)
   #mask data by sampling window
-  r <- mask(x = r, mask = sant_samp)
+  r <- mask(x = r, mask = maas_samp)
   #convert raster to spatial points
   xy <- as.data.frame(rasterToPoints(r))
   #add to species object
   if(nrow(xy)==0){df$sampled_distribution <- c("No sampled data")
   n <- n + 1}
-  else{df$sampled_distribution <- xy[,c("x", "y")]}
+  else{df$sampled_distribution <- xy[,c("x", "y")]
+  indx <- append(indx, i)}
   saveRDS(df, i)
 }
+saveRDS(indx, "./results/virtual-species/sampled/maas.RDS")
 #-----------Finish--------------
 message(paste0("There are ", n, " out of ",
              length(sant_files) +
