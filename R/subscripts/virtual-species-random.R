@@ -15,11 +15,11 @@
 library(raster)
 library(virtualspecies)
 library(pbmcapply)
-source("./R/options.R")
 #plot outputs
 pl = FALSE
 #use CESGA
 setwd("/mnt/netapp2/Store_uni/home/uvi/ba/ljo/NicheCompleteness/")
+source("./R/options.R")
 #-----------Analyses--------------
 #intervals for analyses
 intervals <- c("sant", "camp", "maas")

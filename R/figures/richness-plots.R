@@ -1,6 +1,6 @@
 ## ---------------------------
 ##
-## Script name: richness_plots.R
+## Script name: richness-plots.R
 ##
 ## Purpose of script: richness plots
 ##
