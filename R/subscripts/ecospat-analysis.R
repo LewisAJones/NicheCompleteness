@@ -96,7 +96,16 @@ for(i in sant_files){
   x1 <- cbind(median(scores.full[,1]), median(scores.full[,2]))
   x2 <- cbind(median(scores.sampled[,1]), median(scores.sampled[,2]))
   centroid <- as.numeric(sqrt(rowSums((x1 - x2)^2)))
-  df <- cbind.data.frame(df, overlap, centroid)
+  
+  #calculate niche breadth
+  landscapeBr <- grid.clim.full$Z; landscapeBr[landscapeBr > 0] <- 1
+    landscapeBr <- cellStats(x = landscapeBr, stat = "sum")
+  fullBr <- grid.clim.full$w
+    fullBr <- cellStats(x = fullBr, stat = "sum")
+  sampBr <- grid.clim.samp$w
+    sampBr <- cellStats(x = sampBr, stat = "sum")
+  
+  df <- cbind.data.frame(df, overlap, centroid, landscapeBr, fullBr, sampBr)
   
   #add species name
   species <- tools::file_path_sans_ext(basename(i))
@@ -196,7 +205,16 @@ for(i in camp_files){
   x1 <- cbind(median(scores.full[,1]), median(scores.full[,2]))
   x2 <- cbind(median(scores.sampled[,1]), median(scores.sampled[,2]))
   centroid <- as.numeric(sqrt(rowSums((x1 - x2)^2)))
-  df <- cbind.data.frame(df, overlap, centroid)
+  
+  #calculate niche breadth
+  landscapeBr <- grid.clim.full$Z; landscapeBr[landscapeBr > 0] <- 1
+  landscapeBr <- cellStats(x = landscapeBr, stat = "sum")
+  fullBr <- grid.clim.full$w
+  fullBr <- cellStats(x = fullBr, stat = "sum")
+  sampBr <- grid.clim.samp$w
+  sampBr <- cellStats(x = sampBr, stat = "sum")
+  
+  df <- cbind.data.frame(df, overlap, centroid, landscapeBr, fullBr, sampBr)
   
   #add species name
   species <- tools::file_path_sans_ext(basename(i))
@@ -296,7 +314,16 @@ for(i in maas_files){
   x1 <- cbind(median(scores.full[,1]), median(scores.full[,2]))
   x2 <- cbind(median(scores.sampled[,1]), median(scores.sampled[,2]))
   centroid <- as.numeric(sqrt(rowSums((x1 - x2)^2)))
-  df <- cbind.data.frame(df, overlap, centroid)
+  
+  #calculate niche breadth
+  landscapeBr <- grid.clim.full$Z; landscapeBr[landscapeBr > 0] <- 1
+  landscapeBr <- cellStats(x = landscapeBr, stat = "sum")
+  fullBr <- grid.clim.full$w
+  fullBr <- cellStats(x = fullBr, stat = "sum")
+  sampBr <- grid.clim.samp$w
+  sampBr <- cellStats(x = sampBr, stat = "sum")
+  
+  df <- cbind.data.frame(df, overlap, centroid, landscapeBr, fullBr, sampBr)
   
   #add species name
   species <- tools::file_path_sans_ext(basename(i))

@@ -15,6 +15,7 @@
 library(MetBrewer)
 library(rasterVis)
 library(raster)
+library(gridExtra)
 #---------------------------------
 #stack rasters
 sant <- stack(list.files(paste0("./data/climate/sant/"), pattern = ".grd", full.names = TRUE))
@@ -103,4 +104,4 @@ p4 <- levelplot(maas$min_temp, margin = list(FUN = 'median'), contour=TRUE,
                 col.regions = rev(MetBrewer::met.brewer("Hiroshige", n = 100, type = c("continuous"))))
 
 p <- grid.arrange(p1, p2, p3, p4)
-ggsave("./figures/maas_vars.png", p, width = 200, height = 150, units = "mm", scale = 2.5)
+ggsave("./figures/maas_vars.jpg", p, width = 200, height = 150, units = "mm", scale = 2.5)

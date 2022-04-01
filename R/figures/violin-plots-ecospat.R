@@ -14,23 +14,37 @@
 #---------Load packages-----------
 library(MetBrewer)
 library(ggplot2)
+library(ggpubr)
+library(dplyr)
 #---------------------------------
 #load data
-# create a dataset
-data <- data.frame(
-  interval=c( rep("Santonian",500), rep("Campanian",500), rep("Maastrichtian",500)),
-  value=c( rnorm(500, 10, 5), rnorm(500, 13, 1), rnorm(500, 18, 1))
-)
+sant <- readRDS("./results/ecospat/sant.RDS")
+sant$interval <- c("Santonian")
+camp <- readRDS("./results/ecospat/camp.RDS")
+camp$interval <- c("Campanian")
+maas <- readRDS("./results/ecospat/maas.RDS")
+maas$interval <- c("Maastrichtian")
+
+data <- rbind.data.frame(sant, camp, maas)
 
 #convert data to factors for plotting
 data$interval <- factor(data$interval, levels = c("Santonian","Campanian", "Maastrichtian"), ordered = TRUE)
+
 #---------SCHOENER'S D-------------
+#count number of observations
+summ <- data %>%
+  group_by(interval) %>%
+  summarize(n = n(), overlap = max(overlap)*1.05)
+
 p1 <- data %>%
-  ggplot( aes(x=interval, y=value, fill=interval)) +
-  geom_violin() +
+  ggplot( aes(x=interval, y=overlap, fill=interval)) +
+  geom_violin(draw_quantiles = c(0.25, 0.5, 0.75)) +
+  geom_text(data = summ, aes(x = interval, y = overlap, label = n)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = seq(0, 1, 0.25)) +
   scale_fill_met_d(name = "Hiroshige", alpha=1) +
   labs(x = "Interval", y = "Schoener's D") +
-  theme(panel.background = element_blank(),
+  theme(plot.background = element_rect(colour = NA, fill = "white"),
+        panel.background = element_blank(),
         plot.margin = margin(0.5,0.5,0.5,0.5, "cm"),
         panel.grid.minor.y = element_line(colour = "grey90"),
         panel.grid.minor.x = element_line(colour = "grey90"),
@@ -44,14 +58,22 @@ p1 <- data %>%
         axis.title = element_text(size = 14, face = "bold", vjust = 0),
         strip.text = element_text(size = 12, face = "bold"),
         aspect.ratio = 1)
-
+p1
 #---------NICHE UNFILLING-------------
+#count number of observations
+summ <- data %>%
+  group_by(interval) %>%
+  summarize(n = n(), overlap = max(unfilling)*1.05)
+
 p2 <- data %>%
-  ggplot( aes(x=interval, y=value, fill=interval)) +
-  geom_violin() +
+  ggplot( aes(x=interval, y=unfilling, fill=interval)) +
+  geom_violin(draw_quantiles = c(0.25, 0.5, 0.75)) +
+  geom_text(data = summ, aes(x = interval, y = overlap, label = n)) +
   scale_fill_met_d(name = "Hiroshige", alpha=1) +
+  scale_y_continuous(breaks = seq(0, 1, 0.25), labels = seq(0, 1, 0.25)) +
   labs(x = "Interval", y = "Niche unfilling") +
-  theme(panel.background = element_blank(),
+  theme(plot.background = element_rect(colour = NA, fill = "white"),
+        panel.background = element_blank(),
         plot.margin = margin(0.5,0.5,0.5,0.5, "cm"),
         panel.grid.minor.y = element_line(colour = "grey90"),
         panel.grid.minor.x = element_line(colour = "grey90"),
@@ -67,12 +89,19 @@ p2 <- data %>%
         aspect.ratio = 1)
 p2
 #---------CENTROID-------------
+#count number of observations
+summ <- data %>%
+  group_by(interval) %>%
+  summarize(n = n(), overlap = max(centroid)*1.05)
+
 p3 <- data %>%
-  ggplot( aes(x=interval, y=value, fill=interval)) +
-  geom_violin() +
+  ggplot( aes(x=interval, y=centroid, fill=interval)) +
+  geom_violin(draw_quantiles = c(0.25, 0.5, 0.75)) +
+  geom_text(data = summ, aes(x = interval, y = overlap, label = n)) +
   scale_fill_met_d(name = "Hiroshige", alpha=1) +
   labs(x = "Interval", y = "Centroid distance") +
-  theme(panel.background = element_blank(),
+  theme(plot.background = element_rect(colour = NA, fill = "white"),
+        panel.background = element_blank(),
         plot.margin = margin(0.5,0.5,0.5,0.5, "cm"),
         panel.grid.minor.y = element_line(colour = "grey90"),
         panel.grid.minor.x = element_line(colour = "grey90"),
@@ -89,6 +118,6 @@ p3 <- data %>%
 p3
 #---------------------------------
 #arrange and save
-p <- ggpubr::ggarrange(p1, p2, p3, nrow = 3, labels = "AUTO")
-ggsave("./figures/ecospat_violin.png", height = 200, width = 70, units = "mm", dpi = 600, scale = 1.6)
+p <- ggpubr::ggarrange(p1, p2, p3, ncol = 3, labels = "AUTO", align = "v")
+ggsave("./figures/ecospat_violin.jpg", height = 65, width = 200, units = "mm", dpi = 600, scale = 1.6)
 

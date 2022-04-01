@@ -32,7 +32,7 @@ for(int in intervals){
   #stack rasters
   stk <- stack(files)
   
-  virtual_species <- pbmclapply(1:n_species, function(n){
+  invisible(pbmclapply(1:n_species, function(n){
     
     #generate random species
     exist <- 0
@@ -68,11 +68,11 @@ for(int in intervals){
     #exploration stage (sample from potential options)
     #generate d for good dispersal capacity
     if(random.sp$dispersal_cap == "good_disp"){
-      d <- sample(x = seq(0, good_disp, 1), size = burn_in, replace = TRUE, prob = dgeom(x = seq(0, good_disp, 1), prob = 0.8))
+      d <- sample(x = seq(0, good_disp, 1), size = burn_in, replace = TRUE, prob = exp(-3 * seq(0, good_disp, 1)))
     }
     #generate d for poor dispersal capacity
     if(random.sp$dispersal_cap == "poor_disp"){
-      d <- sample(x = seq(0, poor_disp, 1), size = burn_in, replace = TRUE, prob = dgeom(x = seq(0, poor_disp, 1), prob = 0.8))
+      d <- sample(x = seq(0, poor_disp, 1), size = burn_in, replace = TRUE, prob = exp(-4 * seq(0, poor_disp, 1)))
     }
     
     #dispersal simulation stage
@@ -103,7 +103,7 @@ for(int in intervals){
       #all values >= 1 update to 1 (specifies presence)
       r_origin[r_origin >= 1] <- 1
     }
-    #add raster to species object
+      #add raster to species object
     random.sp$ras_distribution <- r_origin
     
     #convert raster to spatial points
@@ -117,5 +117,5 @@ for(int in intervals){
     
     #save data
     saveRDS(random.sp, paste0("./results/virtual-species/", int, "/species-", n, ".RDS"))
-  }, mc.cores = detectCores()-1, mc.preschedule = FALSE, mc.cleanup = TRUE) #for parallel processing
+  }, mc.cores = detectCores()-1, mc.preschedule = FALSE, mc.cleanup = TRUE)) #for parallel processing
 }

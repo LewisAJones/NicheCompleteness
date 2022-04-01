@@ -19,7 +19,7 @@ cols <- met.brewer(name="Hiroshige",n=5,type="discrete")
 cols <- rev(cols)
 cols[6] <- "black"; cols[7] <- "white"
 
-png("./figures/niche_completeness.png", width = 125,  height = 125, units = "mm", res = 600)
+jpeg("./figures/niche_completeness.jpg", width = 125,  height = 125, units = "mm", res = 600)
 par(mar = c(2, 2, 0.1, 0.1))
 
 plot(range(0,1),range(0,1),type="n", yaxt="n",xaxt="n",xlab="",ylab="",bty="n")

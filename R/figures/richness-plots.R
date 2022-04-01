@@ -58,7 +58,7 @@ crs(maas_hs) <- gcrs
 maas_hs <- projectRaster(from = maas_hs, crs = prj, res = res)
 #---------------------------------
 
-png("./figures/div_plots.png", width = 160,  height = 220, units = "mm", res = 600)
+jpeg("./figures/div_plots.jpg", width = 160,  height = 220, units = "mm", res = 600)
 par(mfrow=c(3,1), mar = c(1, 1, 1, 1))
 div_plot(x = sant, hs = sant_hs, title = "Santonian")
 div_plot(x = camp, hs = camp_hs, title = "Campanian")

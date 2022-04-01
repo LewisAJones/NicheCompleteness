@@ -34,7 +34,7 @@ maas_samp <- raster("./results/sampling-window/sampling_raster_maas.grd")
   maas_mask[maas_mask > 0] <- 0
   maas_samp <- maas_mask + maas_samp
   
-png("./figures/sampling_plots.png", width = 150,  height = 220, units = "mm", res = 600)
+jpeg("./figures/sampling_plots.jpg", width = 150,  height = 220, units = "mm", res = 600)
 par(mfrow=c(3,1), mar = c(1.5, 1.5, 1.5, 1.5))
 plot(sant_samp,
      main = "Santonian",

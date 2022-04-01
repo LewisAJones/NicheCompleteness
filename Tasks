@@ -1,6 +1,11 @@
 Outstanding tasks
-- Boxplots/violin plots
 - Methods section
 - Introduction
 - Simulation workflow
 - Which ENM models?
+  - MAXENT
+  - BIOCLIM
+  - DOMAIN
+
+
+- rerun with exponential decay curves, higher reduction in dispersal capacity?

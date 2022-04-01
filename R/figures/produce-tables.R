@@ -69,7 +69,7 @@ df <- cbind.data.frame(Intervals, Simulated, Sampled, Threshold, SC, ext)
 colnames(df) <- c("Intervals", "Simulated \n species (n)", "Sampled \n species (n)", "Threshold \n species (n)", "Sampling \n coverage (%)", "Sampling \n extent (km)")
 
 #save
-png("./figures/simulation_summary.png", height=35, width=175, res = 300, units = "mm")
+jpeg("./figures/simulation_summary.jpg", height=35, width=175, res = 300, units = "mm")
 p<-tableGrob(df, rows = NULL)
 grid.arrange(p)
 dev.off()
@@ -167,7 +167,7 @@ Min <- round(c(min_unfilling[1],
 df <- cbind.data.frame(df, Mean, SD, Max, Min)
 
 #save plot
-png("./figures/ecospat_summary.png", height=72, width=130, res = 300, units = "mm")
+jpeg("./figures/ecospat_summary.jpg", height=72, width=130, res = 300, units = "mm")
 p<-tableGrob(df, rows = NULL)
 grid.arrange(p)
 dev.off()
