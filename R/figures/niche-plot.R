@@ -17,10 +17,10 @@ source("./R/options.R")
 cols <- met.brewer(name="Hokusai3", n = 5, direction = -1)
 cols[6] <- "black"; cols[7] <- "white"
 # Generate image file
-jpeg("./figures/niche_completeness.jpg", 
+png("./figures/niche_completeness.png", 
      width = 125,  height = 125, units = "mm", res = 600)
 # Set margins
-par(mar = c(2, 2, 2, 2))
+par(mar = c(2, 2, 2, 2), bg="transparent")
 
 plot(x = 1, y = 1, 
      xlim = c(0, 1),

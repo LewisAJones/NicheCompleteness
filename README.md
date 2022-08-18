@@ -10,7 +10,9 @@ To cite the paper:
 To cite this repository:
 > XXXX
 
-<img align="center" src="figures/niche_completeness.jpg" width="300" height= auto />
+<p align="center">
+<img src="figures/niche_completeness.png" width="300" height= auto />
+</p>
 
 -------
 ## Data
