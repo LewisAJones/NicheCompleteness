@@ -13,30 +13,29 @@
 ##
 #---------Load packages-----------
 library(raster)
+source("./R/options.R")
 #---------------------------------
 #sampling windows
 sant_samp <- raster("./results/sampling-window/sampling_raster_sant.grd")
-  sant_samp[is.na(sant_samp)] <- 0
-  sant_samp[sant_samp > 0] <- 1
-  sant_mask <- raster("./data/climate/sant/max_precip.grd")
-  sant_mask[sant_mask > 0] <- 0
-  sant_samp <- sant_mask + sant_samp
+sant_samp[sant_samp > 0] <- 1
 camp_samp <- raster("./results/sampling-window/sampling_raster_camp.grd")
-  camp_samp[is.na(camp_samp)] <- 0
-  camp_samp[camp_samp > 0] <- 1
-  camp_mask <- raster("./data/climate/camp/max_precip.grd")
-  camp_mask[camp_mask > 0] <- 0
-  camp_samp <- camp_mask + camp_samp
+camp_samp[camp_samp > 0] <- 1
 maas_samp <- raster("./results/sampling-window/sampling_raster_maas.grd")
-  maas_samp[is.na(maas_samp)] <- 0
-  maas_samp[maas_samp > 0] <- 1
-  maas_mask <- raster("./data/climate/maas/max_precip.grd")
-  maas_mask[maas_mask > 0] <- 0
-  maas_samp <- maas_mask + maas_samp
-  
-jpeg("./figures/sampling_plots.jpg", width = 150,  height = 220, units = "mm", res = 600)
-par(mfrow=c(3,1), mar = c(1.5, 1.5, 1.5, 1.5))
+maas_samp[maas_samp > 0] <- 1
+#---------------------------------
+#generate background for plot
+r <- raster(res = 1, ext = extent(ex), vals = 1)
+r <- projectRaster(from = r, crs = prj, res = res)
+#generate border for plotting
+shp <- rasterToPolygons(x = r, dissolve = TRUE, na.rm = TRUE)
+shp <- smoothr::smooth(x = shp, method = "ksmooth", smoothness = 20)
+#---------------------------------
+#plot  
+jpeg("./figures/sampling_plots.jpg", width = 180,  height = 270, units = "mm", res = 300)
+par(mfrow=c(3,1), mar = c(1, 1, 1, 1))
+plot(shp, col = "#f7fbff", lwd = 2)
 plot(sant_samp,
+     add = TRUE,
      main = "Santonian",
      col = c("grey90", "forestgreen"),
      box = FALSE,
@@ -45,13 +44,19 @@ plot(sant_samp,
      legend.width = 0,
      legend.shrink = 0,
      legend.mar = 0,
-     interpolate = TRUE)
-legend("right",
+     interpolate = FALSE)
+legend("bottomright",
        legend = c("Sampled", "Not sampled"),
        fill = c("forestgreen", "grey90"),
        border = "black",
-       bty = "n")
+       bty = "n",
+       cex = 1.5)
+plot(shp, col = NA, lwd = 2, add = TRUE)
+title("Santonian", line = -2, adj = 0, cex.main = 2)
+
+plot(shp, col = "#f7fbff")
 plot(camp_samp,
+     add = TRUE,
      main = "Campanian",
      col = c("grey90", "forestgreen"),
      box = FALSE,
@@ -60,13 +65,19 @@ plot(camp_samp,
      legend.width = 0,
      legend.shrink = 0,
      legend.mar = 0,
-     interpolate = TRUE)
-legend("right",
+     interpolate = FALSE)
+legend("bottomright",
        legend = c("Sampled", "Not sampled"),
        fill = c("forestgreen", "grey90"),
        border = "black",
-       bty = "n")
+       bty = "n",
+       cex = 1.5)
+plot(shp, col = NA, lwd = 2, add = TRUE)
+title("Campanian", line = -2, adj = 0, cex.main = 2)
+
+plot(shp, col = "#f7fbff")
 plot(maas_samp,
+     add = TRUE,
      main = "Maastrichtian",
      col = c("grey90", "forestgreen"),
      box = FALSE,
@@ -75,11 +86,14 @@ plot(maas_samp,
      legend.width = 0,
      legend.shrink = 0,
      legend.mar = 0,
-     interpolate = TRUE)
-legend("right",
+     interpolate = FALSE)
+legend("bottomright",
        legend = c("Sampled", "Not sampled"),
        fill = c("forestgreen", "grey90"),
        border = "black",
-       bty = "n")
+       bty = "n",
+       cex = 1.5)
+plot(shp, col = NA, lwd = 2, add = TRUE)
+title("Maastrichtian", line = -2, adj = 0, cex.main = 2)
 dev.off() 
 

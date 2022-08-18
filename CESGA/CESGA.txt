@@ -4,7 +4,11 @@ scp -r /Users/lewis/Documents/GitHub/NicheCompleteness/ uvibaljo@ft2.cesga.es:/m
 
 #transfer folder from CESGA to PC
 
-scp -r uvibaljo@ft2.cesga.es:/mnt/netapp2/Store_uni/home/uvi/ba/ljo/NicheCompleteness/results/virtual-species/ /Users/lewis/Documents/GitHub/CESGA/NicheCompleteness/ 
+scp -r uvibaljo@ft2.cesga.es:/mnt/netapp2/Store_uni/home/uvi/ba/ljo/NicheCompleteness/results/dismo/ /Users/lewis/Documents/GitHub/CESGA/NicheCompleteness/ 
+
+#transfer single file
+
+scp /Users/lewis/Documents/GitHub/NicheCompleteness/R/subscripts/dismo-analysis.R uvibaljo@ft2.cesga.es:/mnt/netapp2/Store_uni/home/uvi/ba/ljo/
 
 #login to ssh
 

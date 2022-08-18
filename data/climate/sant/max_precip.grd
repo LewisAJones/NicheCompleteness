@@ -1,14 +1,14 @@
 [general]
 creator=R package 'raster'
-created=2022-04-01 18:10:41
+created=2022-08-18 15:42:43
 [georeference]
-nrows=190
-ncols=371
-xmin=-18536282.1083801
-ymin=-9479952.15192635
-xmax=18563717.8916199
-ymax=9520047.84807365
-projection=+proj=moll +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs
+nrows=180
+ncols=360
+xmin=-180
+ymin=-90
+xmax=180
+ymax=90
+projection=+proj=longlat +datum=WGS84 +no_defs
 [data]
 datatype=FLT4S
 byteorder=little

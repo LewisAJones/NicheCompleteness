@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -t 15:00:00
+#SBATCH -t 25:00:00
 #SBATCH -p thinnodes
 #SBATCH -n 24
 #SBATCH --job-name NicheCompleteness

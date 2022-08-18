@@ -6,64 +6,134 @@
 ##
 ## Author: Dr Lewis Jones
 ##
-## Date Created: 2022-03-23
+## Last updated: 2022-08-17
 ##
-## Copyright (c) Lewis Jones, 2022
-## Email: LewisA.Jones@outlook.com
-##
-#---------Load packages-----------
+# Load packages-----------------------------------------------------------------
 library(raster)
-#---------------------------------
-#species files
+#-------------------------------------------------------------------------------
+# Create directory
+dir.create("./results/virtual-species/richness/", showWarnings = FALSE)
+# Species files
 sant_files <- list.files("./results/virtual-species/sant/", full.names = TRUE)
 camp_files <- list.files("./results/virtual-species/camp/", full.names = TRUE)
 maas_files <- list.files("./results/virtual-species/maas/", full.names = TRUE)
 
-#sampling windows
+# Sampling windows
 sant_samp <- raster("./results/sampling-window/sampling_raster_sant.grd")
-sant_samp[!is.na(sant_samp)] <- 1
+sant_samp[sant_samp > 0] <- 1
 camp_samp <- raster("./results/sampling-window/sampling_raster_camp.grd")
-camp_samp[!is.na(camp_samp)] <- 1
+camp_samp[camp_samp > 0] <- 1
 maas_samp <- raster("./results/sampling-window/sampling_raster_maas.grd")
-maas_samp[!is.na(maas_samp)] <- 1
-#-----------Santonian--------------
-#initial raster
+maas_samp[maas_samp > 0] <- 1
+# Plotting format
+par(mfrow=c(1,3))
+# Santonian --------------------------------------------------------------------
+# Initial raster
+# Potential distribution
+# For loop (add all species distributions for diversity map)
+r <- readRDS(sant_files[1])$pa.raster
+r[r > 0] <- 0
+for(i in sant_files){
+  tmp <- readRDS(i)$pa.raster
+  r <- r + tmp
+}
+# Save raster
+writeRaster(r, "./results/virtual-species/richness/sant_potential.grd", 
+            overwrite = TRUE)
+# Plot raster
+plot(r)
+# Initial raster
+# Realized and sampled distributions
 r <- readRDS(sant_files[1])$ras_distribution
 r[r > 0] <- 0
-#for loop (add all species distributions for diversity map)
+# For loop (add all species distributions for diversity map)
 for(i in sant_files){
   tmp <- readRDS(i)$ras_distribution
   r <- r + tmp
 }
+# Plot raster
 plot(r)
-writeRaster(r, "./results/virtual-species/misc/sant_div.grd", overwrite = TRUE)
-r <- mask(x = r, mask = sant_samp)
-writeRaster(r, "./results/virtual-species/misc/sant_div_samp.grd", overwrite = TRUE)
-#-----------Campanian--------------
-#initial raster
+# Save raster
+writeRaster(r, "./results/virtual-species/richness/sant_div.grd", 
+            overwrite = TRUE)
+# Mask data
+r <- mask(x = r, mask = sant_samp, updatevalue = 0, maskvalue = 0)
+# Plot raster
+plot(r)
+# Save raster
+writeRaster(r, "./results/virtual-species/richness/sant_div_samp.grd", 
+            overwrite = TRUE)
+# Campanian --------------------------------------------------------------------
+# Initial raster
+# Potential distribution
+# For loop (add all species distributions for diversity map)
+r <- readRDS(camp_files[1])$pa.raster
+r[r > 0] <- 0
+for(i in camp_files){
+  tmp <- readRDS(i)$pa.raster
+  r <- r + tmp
+}
+# Save raster
+writeRaster(r, "./results/virtual-species/richness/camp_potential.grd", 
+            overwrite = TRUE)
+# Plot raster
+plot(r)
+# Initial raster
+# Realized and sampled distributions
 r <- readRDS(camp_files[1])$ras_distribution
 r[r > 0] <- 0
-#for loop (add all species distributions for diversity map)
+# For loop (add all species distributions for diversity map)
 for(i in camp_files){
   tmp <- readRDS(i)$ras_distribution
   r <- r + tmp
 }
+# Plot raster
 plot(r)
-writeRaster(r, "./results/virtual-species/misc/camp_div.grd", overwrite = TRUE)
-r <- mask(x = r, mask = sant_samp)
-writeRaster(r, "./results/virtual-species/misc/camp_div_samp.grd", overwrite = TRUE)
-#-----------Maastrichtian--------------
-#initial raster
+# Save raster
+writeRaster(r, "./results/virtual-species/richness/camp_div.grd", 
+            overwrite = TRUE)
+# Mask data
+r <- mask(x = r, mask = camp_samp, updatevalue = 0, maskvalue = 0)
+# Plot raster
+plot(r)
+# Save raster
+writeRaster(r, "./results/virtual-species/richness/camp_div_samp.grd", 
+            overwrite = TRUE)
+# Maastrichtian-----------------------------------------------------------------
+# Initial raster
+# Potential distribution
+# For loop (add all species distributions for diversity map)
+r <- readRDS(maas_files[1])$pa.raster
+r[r > 0] <- 0
+for(i in maas_files){
+  tmp <- readRDS(i)$pa.raster
+  r <- r + tmp
+}
+# Save raster
+writeRaster(r, "./results/virtual-species/richness/maas_potential.grd", 
+            overwrite = TRUE)
+# Plot raster
+plot(r)
+# Initial raster
+# Realized and sampled distributions
 r <- readRDS(maas_files[1])$ras_distribution
 r[r > 0] <- 0
-#for loop (add all species distributions for diversity map)
+# For loop (add all species distributions for diversity map)
 for(i in maas_files){
   tmp <- readRDS(i)$ras_distribution
   r <- r + tmp
 }
+# Plot raster
 plot(r)
-writeRaster(r, "./results/virtual-species/misc/maas_div.grd", overwrite = TRUE)
-r <- mask(x = r, mask = maas_samp)
-writeRaster(r, "./results/virtual-species/misc/maas_div_samp.grd", overwrite = TRUE)
+# Save raster
+writeRaster(r, "./results/virtual-species/richness/maas_div.grd", 
+            overwrite = TRUE)
+# Mask data
+r <- mask(x = r, mask = maas_samp, updatevalue = 0, maskvalue = 0)
+# Plot raster
+plot(r)
+# Save raster
+writeRaster(r, "./results/virtual-species/richness/maas_div_samp.grd", 
+            overwrite = TRUE)
 #-----------FINISH--------------
 beepr::beep(sound = 2)

@@ -25,7 +25,7 @@ intervals <- c("sant", "camp", "maas")
 for(int in intervals){
   
   #get file paths
-  files <- list.files(paste0("./data/climate/", int, "/"), full.names = TRUE)
+  files <- list.files(paste0("./data/climate/", int, "/"), pattern = ".grd", full.names = TRUE)
 
   #stack rasters
   stk <- stack(files)
@@ -43,7 +43,10 @@ for(int in intervals){
     if(niche_type == "narrow"){niche <- narrow}
     
     #randomly sample cell from rasters to define 'optimal suitability value'
-    opt_vals <- sampleRandom(x = stk, size = 1)
+    opt_vals <- sampleRandom(x = stk, size = 1, xy = TRUE, df = TRUE)
+    #get origin
+    origin <- data.frame(matrix(opt_vals[,c("x", "y")], ncol = 2))
+    colnames(origin) <- c("x", "y")
     
     #define response function following a gausian distribution  
     params <- formatFunctions(max_precip = c(fun = 'dnorm',
@@ -78,7 +81,7 @@ for(int in intervals){
     random.sp$pa.raster <- random.sp$PA.conversion$pa.raster
       
     #sample origin occurrence from random species
-    random.sp$origin <- sampleOccurrences(x = random.sp, n = 1, plot = plt, replacement = TRUE)$sample.points[c("x", "y")]
+    random.sp$origin <- origin
     
     #generate raster of species origin
     r_origin <- random.sp$pa.raster
@@ -91,11 +94,11 @@ for(int in intervals){
     #exploration stage (sample from potential options)
     #generate d for good dispersal capacity
     if(random.sp$dispersal_cap == "good_disp"){
-      d <- sample(x = seq(0, good_disp, 1), size = burn_in, replace = TRUE, prob = dgeom(x = seq(0, good_disp, 1), prob = 0.8))
+      d <- sample(x = seq(0, good_disp, 1), size = burn_in, replace = TRUE, prob = dexp(x = seq(0, good_disp, 1), rate = 1))
     }
     #generate d for poor dispersal capacity
     if(random.sp$dispersal_cap == "poor_disp"){
-      d <- sample(x = seq(0, poor_disp, 1), size = burn_in, replace = TRUE, prob = dgeom(x = seq(0, poor_disp, 1), prob = 0.8))
+      d <- sample(x = seq(0, poor_disp, 1), size = burn_in, replace = TRUE, prob = dexp(x = seq(0, poor_disp, 1), rate = 1.5))
     }
 
     #dispersal simulation stage

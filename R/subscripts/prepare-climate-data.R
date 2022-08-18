@@ -1,4 +1,4 @@
-## ---------------------------
+## -----------------------------------------------------------------------------
 ##
 ## Script name: prepare-climate-data.R
 ##
@@ -6,149 +6,159 @@
 ##
 ## Author: Dr Lewis Jones
 ##
-## Date Created: 2022-03-04
+## Last update: 2022-08-17
 ##
-## Copyright (c) Lewis Jones, 2022
-## Email: LewisA.Jones@outlook.com
-##
-#---------Load packages-----------
+# Load packages ----------------------------------------------------------------
 library(raster)
 library(ncdf4)
 library(stringr)
 source("./R/options.R")
-#-----------Data prep-------------
-#get months in lower case for data loading
+# Data preparation -------------------------------------------------------------
+# Grab months and convert to lowercase
 months <- c(tolower(month.abb))
-#define raster for resampling
+# Define raster for resampling
 r <- raster(res = 1, ext = extent(ex))
-#---------Maastrichtian-----------
-#load mask 
-msk <- raster("./data/raw-data/climate/Maastrichtian/teyeo/teyeo.qrparm.mask.nc", varname = "lsm")
-#get file names
-files <- list.files("./data/raw-data/climate/Maastrichtian/teyeo/", full.names = TRUE)
-#extract only monthly variables
+# Maastrichtian ----------------------------------------------------------------
+# Load mask 
+msk <- raster(
+  "./data/raw-data/climate/Maastrichtian/teyeo/teyeo.qrparm.mask.nc", 
+  varname = "lsm")
+# Get file names
+files <- list.files("./data/raw-data/climate/Maastrichtian/teyeo/", 
+                    full.names = TRUE)
+# Extract only monthly variables
 files <- files[sapply(months, function(x){str_which(files, x)})]
-#load precipitation data
+# Load precipitation data
 precip <- stack(files, varname = "precip_mm_srf")
-#mask data
+# Mask data
 precip <- mask(x = precip, mask = msk, maskvalue = 0)
-#assign names
+# Assign names
 names(precip) <- months
-#convert from kg/m2/s to mm/day
+# Convert from kg/m2/s to mm/day
 precip <- precip * 86400
-#load temperature data
+# Load temperature data
 temp <- stack(files, varname = "temp_mm_srf")
-#mask data
+# Mask data
 temp <- mask(x = temp, mask = msk, maskvalue = 0)
-#assign names
+# Assign names
 names(temp) <- months
-#convert kelvin to celsius
+# Convert kelvin to celsius
 temp <- temp - 273.15
-#calculate max and minimums
+# Calculate max and min
 max_precip <- calc(x = precip, fun = max)
 min_precip <- calc(x = precip, fun = min)
 max_temp <- calc(x = temp, fun = max)
 min_temp <- calc(x = temp, fun = min)
-#stack data
+# Stack data
 stk <- stack(max_precip, min_precip, max_temp, min_temp)
-#add names
+# Add names
 names(stk) <- c("max_precip", "min_precip", "max_temp", "min_temp")
-#rotate data
+# Rotate data
 stk <- raster::rotate(stk)
-#resample data
+# Resample data (the extent and resolution must be updated to avoid rgdal issue)
 stk <- resample(x = stk, y = r)
-#define original GCRS
+# Define original GCRS
 crs(stk) <- gcrs
-#project data
-stk <- projectRaster(from = stk, crs = prj, res = res)
+# Plot data
 plot(stk)
-#save data
-writeRaster(x = stk, filename = paste0("./data/climate/maas/", names(stk), ".grd"), bylayer = TRUE, overwrite = TRUE)
-#---------Campanian-----------
-#load mask 
-msk <- raster("./data/raw-data/climate/Campanian/teyeq/teyeq.qrparm.mask.nc", varname = "lsm")
-#get file names
-files <- list.files("./data/raw-data/climate/Campanian/teyeq/", full.names = TRUE)
-#extract only monthly variables
+# Save data
+writeRaster(
+  x = stk,
+  filename = paste0("./data/climate/maas/", 
+  names(stk), ".grd"), bylayer = TRUE, overwrite = TRUE)
+# Campanian---------------------------------------------------------------------
+# Load mask 
+msk <- raster("./data/raw-data/climate/Campanian/teyeq/teyeq.qrparm.mask.nc", 
+              varname = "lsm")
+# Get file names
+files <- list.files("./data/raw-data/climate/Campanian/teyeq/",
+                    full.names = TRUE)
+# Extract only monthly variables
 files <- files[sapply(months, function(x){str_which(files, x)})]
-#load precipitation data
+# Load precipitation data
 precip <- stack(files, varname = "precip_mm_srf")
-#mask data
+# Mask data
 precip <- mask(x = precip, mask = msk, maskvalue = 0)
-#assign names
+# Assign names
 names(precip) <- months
-#convert from kg/m2/s to mm/day
+# Convert from kg/m2/s to mm/day
 precip <- precip * 86400
-#load temperature data
+# Load temperature data
 temp <- stack(files, varname = "temp_mm_srf")
-#mask data
+# Mask data
 temp <- mask(x = temp, mask = msk, maskvalue = 0)
-#assign names
+# Assign names
 names(temp) <- months
-#convert kelvin to celsius
+# Convert kelvin to celsius
 temp <- temp - 273.15
-#calculate max and minimums
+# Calculate max and min
 max_precip <- calc(x = precip, fun = max)
 min_precip <- calc(x = precip, fun = min)
 max_temp <- calc(x = temp, fun = max)
 min_temp <- calc(x = temp, fun = min)
-#stack data
+# Stack data
 stk <- stack(max_precip, min_precip, max_temp, min_temp)
-#add names
+# Add names
 names(stk) <- c("max_precip", "min_precip", "max_temp", "min_temp")
-#rotate data
+# Rotate data
 stk <- raster::rotate(stk)
-#resample data
+# Resample data (the extent and resolution must be updated to avoid rgdal issue)
 stk <- resample(x = stk, y = r)
-#define original GCRS
+# Define original GCRS
 crs(stk) <- gcrs
-#project data
-stk <- projectRaster(from = stk, crs = prj, res = res)
+# Plot data
 plot(stk)
-#save data
-writeRaster(x = stk, filename = paste0("./data/climate/camp/", names(stk), ".grd"), bylayer = TRUE, overwrite = TRUE)
-#---------Santonian-----------
-#load mask 
-msk <- raster("./data/raw-data/climate/Santonian/teyer/teyer.qrparm.mask.nc", varname = "lsm")
-#get file names
-files <- list.files("./data/raw-data/climate/Santonian/teyer/", full.names = TRUE)
-#extract only monthly variables
+# Save data
+writeRaster(
+  x = stk,
+  filename = paste0("./data/climate/camp/", 
+                    names(stk), ".grd"), bylayer = TRUE, overwrite = TRUE)
+# Santonian --------------------------------------------------------------------
+# Load mask 
+msk <- raster("./data/raw-data/climate/Santonian/teyer/teyer.qrparm.mask.nc",
+              varname = "lsm")
+# Get file names
+files <- list.files("./data/raw-data/climate/Santonian/teyer/",
+                    full.names = TRUE)
+# Extract only monthly variables
 files <- files[sapply(months, function(x){str_which(files, x)})]
-#load precipitation data
+# Load precipitation data
 precip <- stack(files, varname = "precip_mm_srf")
-#mask data
+# Mask data
 precip <- mask(x = precip, mask = msk, maskvalue = 0)
-#assign names
+# Assign names
 names(precip) <- months
-#convert from kg/m2/s to mm/day
+# Convert from kg/m2/s to mm/day
 precip <- precip * 86400
-#load temperature data
+# Load temperature data
 temp <- stack(files, varname = "temp_mm_srf")
-#mask data
+# Mask data
 temp <- mask(x = temp, mask = msk, maskvalue = 0)
-#assign names
+# Assign names
 names(temp) <- months
-#convert kelvin to celsius
+# Convert kelvin to celsius
 temp <- temp - 273.15
-#calculate max and minimums
+# Calculate max and min
 max_precip <- calc(x = precip, fun = max)
 min_precip <- calc(x = precip, fun = min)
 max_temp <- calc(x = temp, fun = max)
 min_temp <- calc(x = temp, fun = min)
-#stack data
+# Stack data
 stk <- stack(max_precip, min_precip, max_temp, min_temp)
-#add names
+# Add names
 names(stk) <- c("max_precip", "min_precip", "max_temp", "min_temp")
-#rotate data
+# Rotate data
 stk <- raster::rotate(stk)
-#resample data
+# Resample data (the extent and resolution must be updated to avoid rgdal issue)
 stk <- resample(x = stk, y = r)
-#define original GCRS
+# Define original GCRS
 crs(stk) <- gcrs
-#project data
-stk <- projectRaster(from = stk, crs = prj, res = res)
+# Plot data
 plot(stk)
-#save data
-writeRaster(x = stk, filename = paste0("./data/climate/sant/", names(stk), ".grd"), bylayer = TRUE, overwrite = TRUE)
-#--------------------
+# Save data
+writeRaster(
+  x = stk,
+  filename = paste0("./data/climate/sant/", 
+                    names(stk), ".grd"), bylayer = TRUE, overwrite = TRUE)
+#-------------------------------------------------------------------------------
 

@@ -39,7 +39,7 @@ summ <- data %>%
 p1 <- data %>%
   ggplot( aes(x=interval, y=overlap, fill=interval)) +
   geom_violin(draw_quantiles = c(0.25, 0.5, 0.75)) +
-  geom_text(data = summ, aes(x = interval, y = overlap, label = n)) +
+  #geom_text(data = summ, aes(x = interval, y = overlap, label = n/3)) +
   scale_y_continuous(breaks = seq(0, 1, 0.25), labels = seq(0, 1, 0.25)) +
   scale_fill_met_d(name = "Hiroshige", alpha=1) +
   labs(x = "Interval", y = "Schoener's D") +
@@ -67,8 +67,9 @@ summ <- data %>%
 
 p2 <- data %>%
   ggplot( aes(x=interval, y=unfilling, fill=interval)) +
-  geom_violin(draw_quantiles = c(0.25, 0.5, 0.75)) +
-  geom_text(data = summ, aes(x = interval, y = overlap, label = n)) +
+  geom_violin(scale = "width") +
+  geom_boxplot(width = 0.15) +
+  #geom_text(data = summ, aes(x = interval, y = overlap, label = n/3)) +
   scale_fill_met_d(name = "Hiroshige", alpha=1) +
   scale_y_continuous(breaks = seq(0, 1, 0.25), labels = seq(0, 1, 0.25)) +
   labs(x = "Interval", y = "Niche unfilling") +
@@ -96,8 +97,8 @@ summ <- data %>%
 
 p3 <- data %>%
   ggplot( aes(x=interval, y=centroid, fill=interval)) +
-  geom_violin(draw_quantiles = c(0.25, 0.5, 0.75)) +
-  geom_text(data = summ, aes(x = interval, y = overlap, label = n)) +
+  geom_violin(scale = "width") +
+  geom_boxplot(width = 0.15) +
   scale_fill_met_d(name = "Hiroshige", alpha=1) +
   labs(x = "Interval", y = "Centroid distance") +
   theme(plot.background = element_rect(colour = NA, fill = "white"),
@@ -118,6 +119,7 @@ p3 <- data %>%
 p3
 #---------------------------------
 #arrange and save
-p <- ggpubr::ggarrange(p1, p2, p3, ncol = 3, labels = "AUTO", align = "v")
-ggsave("./figures/ecospat_violin.jpg", height = 65, width = 200, units = "mm", dpi = 600, scale = 1.6)
+p <- ggpubr::ggarrange(p2, p3, ncol = 2, labels = "AUTO", align = "v",
+                       font.label = list(size = 20))
+ggsave("./figures/ecospat_violin.jpg", height = 65, width = 150, units = "mm", dpi = 600, scale = 1.6)
 

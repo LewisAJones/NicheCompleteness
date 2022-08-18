@@ -1,20 +1,15 @@
-div_plot <- function(x, hs, title){
-  plot(hs,
-       main = title,
-       adj = 0,
-       col = grey(1:100/100),
-       legend = FALSE,
-       box = FALSE,
-       axes = FALSE,
-       useRaster = TRUE,
-       interpolate = TRUE)
+div_plot <- function(x, title){
+  x <- x/raster::cellStats(x = x, stat = "max")
   plot(x, 
-       add = TRUE, 
-       breaks = seq(0, 1000, 100),
+       breaks = seq(0, 1, 0.1),
        useRaster = TRUE,
-       interpolate = TRUE,
-       col = viridisLite::viridis(n = 10),
-       alpha = 0.8,
-       legend.args = list(text = 'Species richness', side =2, 
-                          font = 2, line = -5, cex = 0.8))
+       interpolate = FALSE,
+       col = viridisLite::turbo(n = 11),
+       alpha = 1,
+       add = TRUE,
+       axes = FALSE,
+       box = FALSE,
+       legend.args = list(text = "Species richness", side =2, 
+                         font = 2, line = 0, cex = 0.8))
+  title(main = title, line = -2)
 }
