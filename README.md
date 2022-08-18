@@ -20,7 +20,7 @@ All data used to run the analyses of this paper are included in this repository.
 
 * `data/` contains two subfolders `data/climate/` and `data/raw-data/`.
 * `data/raw-data/` contains the raw climate data used in this work.
-* `data/climate/` contains the processed climate model data which has been rotated from 0 to 360&deg; to -180 to 180&deg; and downscaled to a horizontal resolution of 1&deg; x 1&deg;. This is the data used for the virtual species simulations.
+* `data/climate/` contains the processed climate model data which has been rotated from 0&deg; to 360&deg; to -180&deg; to 180&deg; and downscaled to a horizontal resolution of 1&deg; x 1&deg;. This is the data used for the virtual species simulations.
 
 -------
 ## Data preparation and analyses
