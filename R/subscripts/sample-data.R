@@ -66,7 +66,7 @@ for (i in camp_files) {
   # Rasterize data for masking
   r <- rasterize(x = df$distribution, y = sant_samp, field = 1)
   # Mask data by sampling window
-  r <- mask(x = r, mask = sant_samp)
+  r <- mask(x = r, mask = camp_samp)
   # Convert raster to spatial points
   xy <- as.data.frame(rasterToPoints(r))
   # Add to species object
@@ -90,7 +90,7 @@ for (i in maas_files) {
   # Rasterize data for masking
   r <- rasterize(x = df$distribution, y = sant_samp, field = 1)
   # Mask data by sampling window
-  r <- mask(x = r, mask = sant_samp)
+  r <- mask(x = r, mask = maas_samp)
   # Convert raster to spatial points
   xy <- as.data.frame(rasterToPoints(r))
   # Add to species object

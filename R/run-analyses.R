@@ -9,6 +9,8 @@
 ## Date Created: 2022-03-04
 ##
 # Analyses----------------------------------------------------------------------
+# Update working directory if using CESGA
+#setwd("/mnt/netapp2/Store_uni/home/uvi/ba/ljo/NicheCompleteness/")
 
 # Prepare climate data
 source("./R/subscripts/prepare-climate-data.R")
@@ -18,7 +20,7 @@ rm(list = ls())
 source("./R/subscripts/sampling-window.R")
 rm(list = ls())
 
-# Generate virtual species (run on CESGA)
+# Generate virtual species
 source("./R/subscripts/virtual-species-random.R")
 rm(list = ls())
 
@@ -34,9 +36,9 @@ rm(list = ls())
 source("./R/subscripts/ecospat-analysis.R")
 rm(list = ls())
 
-##run ENMTools analyses
-#source("./R/subscripts/ENMTools-analysis.R")
-#rm(list = ls())#
+##run dismo analyses
+source("./R/subscripts/dismo-analysis.R")
+rm(list = ls())
 
 # Generate figures
 source("./R/figures/niche-plot.R")

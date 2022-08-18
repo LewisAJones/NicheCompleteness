@@ -12,8 +12,6 @@
 library(raster)
 library(virtualspecies)
 library(pbmcapply)
-# Update wd if using CESGA
-setwd("/mnt/netapp2/Store_uni/home/uvi/ba/ljo/NicheCompleteness/")
 # Load options
 source("./R/options.R")
 # Generate directory
