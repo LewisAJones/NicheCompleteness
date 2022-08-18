@@ -36,7 +36,7 @@ All results can be found in the `results/` folder. These are structured as follo
 
 * `R/virtual-species/` this folder contains all the virtual species data which were simulated in this study. 
 * `R/sampling-window/` this folder contains rasters and dataframes for the stage-level spatial sampling windows used to filter virtual species' distributions.
-* `R/ecospat/` this folder contains the results from ecospat analyses (i.e. niche unfilling and centroid distance results). * `R/dismo/` this folder contains the results from ecological niche modelling geographic comparisons (i.e. binary overlap results).
+* `R/ecospat/` this folder contains the results from ecospat analyses (i.e. niche unfilling and centroid distance results). `R/dismo/` this folder contains the results from ecological niche modelling geographic comparisons (i.e. binary overlap results).
 
 -------
 ## Figures
