@@ -28,12 +28,12 @@ plot(x = 1, y = 1,
      type="n", yaxt="n",xaxt="n",xlab="",ylab="",bty="n")
 
 ##Plot the arrow in the x and y axis
-arrows(x0=0, y0=0, x1 = 1, y1 = 0,lwd=2, code=2, length = 0.08, col = cols[6])
-arrows(x0=0, y0=0, x1 = 0, y1 = 1,lwd=2, code=2, length = 0.08, col = cols[6])
+arrows(x0=0, y0=0, x1 = 1, y1 = 0,lwd=2, code=2, length = 0.08, col = "darkgrey")
+arrows(x0=0, y0=0, x1 = 0, y1 = 1,lwd=2, code=2, length = 0.08, col = "darkgrey")
 
 #Add the labels beside the axes
-mtext(side = 1, text = "PCA 1", line = 0.2, cex = 1.25, col = cols[6])
-mtext(side = 2, text = "PCA 2", line = 0.2, cex = 1.25, col = cols[6])
+mtext(side = 1, text = "PCA 1", line = 0.2, cex = 1.25, col = "darkgrey")
+mtext(side = 2, text = "PCA 2", line = 0.2, cex = 1.25, col = "darkgrey")
 
 points(x = 0.5, y = 0.5, cex = 48, pch = 21, bg = cols[1])
 points(x = 0.53, y = 0.48, cex = 40, pch = 21, col = NA, bg = cols[2])
