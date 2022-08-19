@@ -28,8 +28,4 @@ niche_opt = c("broad", "narrow")
 # Plot outputs?
 plot_output = FALSE
 # ecospat options --------------------------------------------------------------
-ecospat_res = 100 
-  
-# dismo options ----------------------------------------------------------------
-
-  
+ecospat_res = 100

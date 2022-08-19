@@ -58,11 +58,11 @@ for (int in intervals) {
                              xy = df$sampled_distribution[, c("x", "y")])
     
     # Extract climate data to points for potential distribution
-    df$potential_env <- extract(x = stk, y = cells_potential)
+    df$potential_env <- raster::extract(x = stk, y = cells_potential)
     # Extract climate data to points for full distribution
-    df$full_env <- extract(x = stk, y = cells_dist)
+    df$full_env <- raster::extract(x = stk, y = cells_dist)
     # Extract climate data to points for sampled distribution
-    df$sampled_env <- extract(x = stk, y = cells_samp)
+    df$sampled_env <- raster::extract(x = stk, y = cells_samp)
     
     # Compute PCA for whole study area
     pca.env <- ade4::dudi.pca(df$env,

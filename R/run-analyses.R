@@ -21,8 +21,8 @@ source("./R/subscripts/sampling-window.R")
 rm(list = ls())
 
 # Generate virtual species
-source("./R/subscripts/virtual-species-random.R")
-rm(list = ls())
+#source("./R/subscripts/virtual-species-random.R")
+#rm(list = ls())
 
 # Sample species' distributions
 source("./R/subscripts/sample-data.R")

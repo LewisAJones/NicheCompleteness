@@ -15,14 +15,12 @@ library(ENMTools)
 library(pbmcapply)
 #use CESGA
 #setwd("/mnt/netapp2/Store_uni/home/uvi/ba/ljo/NicheCompleteness/")
-source("./R/options.R")
-rm(list=ls()[-which(ls() == "tp")]) #keep test proportion parameter
 source("./R/functions/binary-overlap.R")
 # Analyses ---------------------------------------------------------------------
 # Create directory
 dir.create("./results/dismo/", showWarnings = FALSE)
 # Define intervals
-intervals <- c("sant", "camp", "maas")  
+intervals <- c("camp", "maas")  
 # Run for loop across intervals
 for (int in intervals) {
   # Get species that have been sampled and have more than 5 occurrences
@@ -78,7 +76,7 @@ for (int in intervals) {
     # Convert to binary predictions (any value more than 0 is suitable in
     # climate envelope model)
     LPT <- min(
-      extract(x = species_full.bc.suitability,
+      raster::extract(x = species_full.bc.suitability,
               y = species_full$presence.points))
     species_full.bc.suitability[species_full.bc.suitability >= LPT] <- 1
     species_full.bc.suitability[species_full.bc.suitability < 1] <- 0
@@ -93,7 +91,7 @@ for (int in intervals) {
     # Convert to binary predictions (any value more than 0 is suitable in
     # climate envelope model)
     LPT <- min(
-      extract(x = species_sampled.bc.suitability,
+      raster::extract(x = species_sampled.bc.suitability,
               y = species_sampled$presence.points))
     species_sampled.bc.suitability[species_sampled.bc.suitability >= LPT] <- 1
     species_sampled.bc.suitability[species_sampled.bc.suitability < 1] <- 0
@@ -157,6 +155,7 @@ for (int in intervals) {
     bin_over$species <- species
     bin_over$n <- nrow(df$distribution)
     bin_over$n_samp <- nrow(df$sampled_distribution)
+    cat("species", species)
     # Return data
     return(bin_over)
   })
