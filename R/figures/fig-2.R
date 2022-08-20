@@ -35,19 +35,51 @@ mtext("Positive (+)", font = 2, side = 3, adj = 0.22, cex = 0.5)
 mtext("Negative (-)", font = 2, side = 3, adj = 0.78, cex = 0.5)
 mtext("Positive (+)", font = 2, side = 2, adj = 0.82, cex = 0.5)
 mtext("Negative (-)", font = 2, side = 2, adj = 0.18, cex = 0.5)
+mtext(expression(1~"="~Presence~~0~"="~Absence~~R[1]~"="~reference~~R[2]~"="~prediction), 
+      font = 2, side = 1, adj = 0.08, line = -0.7, cex = 0.35)
 # Add text inside plot
 text(x = 0.5, y = 1.5, font = 2, 
      labels = "True Positive (TP)", col = "white", cex = 0.5)
 text(x = 1.5, y = 1.5, font = 2, 
      labels = "False Positive (FP)", col = "white", cex = 0.5)
-text(x = 1.5, y = 1.35, font = 1, 
+text(x = 1.5, y = 1.65, font = 1, 
      labels = "Type I Error", col = "white", cex = 0.35)
 text(x = 0.5, y = 0.5, font = 2, 
      labels = "False Negative (FN)", col = "white", cex = 0.5)
-text(x = 0.5, y = 0.35, font = 1, 
+text(x = 0.5, y = 0.65, font = 1, 
      labels = "Type II Error", col = "white", cex = 0.35)
 text(x = 1.5, y = 0.5, font = 2, 
      labels = "True Negative (TN)", col = "white", cex = 0.5)
+
+# Matrix addition
+text(x = 0.8, y = 1, font = 2, 
+     labels = expression(R[1]), col = "white", cex = 0.35)
+text(x = 0.9, y = 1, font = 2, 
+     labels = "1 0\n0 1", col = "white", cex = 0.5)
+text(x = 1, y = 1, font = 2, 
+     labels = "+", col = "white", cex = 0.5)
+text(x = 1.2, y = 1, font = 2, 
+     labels = expression(R[2]), col = "white", cex = 0.35)
+text(x = 1.1, y = 1, font = 2, 
+     labels = "1 0\n1 0", col = "white", cex = 0.5)
+# TP
+points(x = 0.481, y = 1.345, pch = 0, col = "black", cex = 0.7)
+text(x = 0.5, y = 1.3, font = 2, 
+     labels = "2 0\n1 1", col = "white", cex = 0.35)
+
+# FP
+points(x = 1.481, y = 1.25, pch = 0, col = "black", cex = 0.7)
+text(x = 1.5, y = 1.3, font = 2, 
+     labels = "2 0\n1 1", col = "white", cex = 0.35)
+
+# FN
+points(x = 0.518, y = 0.2525, pch = 0, col = "black", cex = 0.7)
+text(x = 0.5, y = 0.3, font = 2, 
+     labels = "2 0\n1 1", col = "white", cex = 0.35)
+# TN
+points(x = 1.519, y = 0.345, pch = 0, col = "black", cex = 0.7)
+text(x = 1.5, y = 0.3, font = 2, 
+     labels = "2 0\n1 1", col = "white", cex = 0.35)
 # Save
 dev.off()
 

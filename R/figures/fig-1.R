@@ -35,7 +35,7 @@ p1 <- ggplot() +
             aes(x = -1.4, y = 0.6, label = "N[P]"), size = 4, colour = "white", parse = TRUE) +
   xlab("PCA 1") + 
   ylab("PCA 2") +
-  scale_fill_viridis(begin = 0.1, end = 1, direction = 1) +
+  scale_fill_viridis(begin = 0.1, end = 1, direction = 1, option = "D") +
   theme(legend.position = "none",
         panel.grid = element_blank(),
         panel.background = element_rect(fill = "white"),
