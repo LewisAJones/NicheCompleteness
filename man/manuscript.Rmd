@@ -1,0 +1,81 @@
+---
+title: "Estimation of extinct species' climatic niche limited by incomplete spatial sampling"
+author:
+  - Lewis A. Jones^[Centro de Investigación Mariña, Grupo de Ecoloxía Animal, Universidade de Vigo, 36310 Vigo, Spain.], Alfio A. Chiarenza^1^, Erin E. Saupe^[Department of Earth Sciences, South Parks Road, Oxford, OX1 3AN, UK.], Alexander Farnsworth^[School of Geographical Sciences and Cabot institute, University of Bristol, Bristol, BS8 1TH, UK.], Paul J. Valdes^3^, and Sara Varela^1^
+  - "**Author for correspondence**`:` Lewis A. Jones (LewisAlan.Jones@uvigo.es)"
+output:
+  word_document:
+    reference_docx: "template.docx"
+bibliography: references.bib
+csl: palaeontology.csl
+---
+
+# Abstract
+
+Ecological niche modelling is applied broadly in ecology to model a species' niche and map suitable habitat. The approach links species' occurrences with environmental predictors to statistically derive response curves. Although commonly applied to study extant taxa, ecological niche modelling is an emerging method in palaeobiology, providing opportunities to test ecological hypotheses regarding the interaction between extinct taxa and their abiotic environment. However, the extent to which the approach can be applied to fossil data remains unconstrained. The fossil record is inherently incomplete and biased by heterogeneous spatial sampling. Consequently, the complete geographic distribution of a species, and its occupation of environmental space, is often unknown. These limitations can bias niche characterisations, leading to potentially erroneous conclusions about niche dynamics through time. Here, we use a virtual species approach to quantify information loss when using fossil data to estimate species' climatic niches and geographic distributions through time. We focus on the Late Cretaceous fossil record to quantify the completeness of species' niches after sampling virtual species by the 'known' spatial sampling window. Our results suggest niche characterisations are often incomplete and biased towards a limited range of climatic conditions. Consequently, statistically derived response curves can be misleading in some cases, resulting in erroneous predictions of suitable habitat. We suggest...
+
+# Keywords
+
+Ecological niche modelling, niche completeness, niche estimation, fossil record bias, sampling bias
+
+# Introduction
+
+# Materials & Methods
+
+## Study area and climate data
+
+We conducted our study at global scale within the terrestrial realm for three Late Cretaceous stages: Santonian (83.6--86.3 Ma), Campanian (72.1--83.6 Ma), and Maastrichtian (66--72.1 Ma). This study period captures the lead up to Earth's most recent mass extinction [@brusatte2015], and has been a focus of previous deep time ecological niche modelling studies [@waterson2016]; @chiarenza2019]. Climatic simulations were carried out for each time interval using the HadCM3BL-M2.1aD model, a version of the HadCM3L coupled atmosphere-ocean general circulation model (AOGCM) [@valdes2017]. The HadCM3L climate model has a horizontal resolution of 2.5° latitude x 3.75° longitude in the atmosphere and ocean, with a vertical resolution of 19 levels in the atmospheric component and 20 levels (5550 m depth) in the oceanic component [@valdes2017]. Critically, this model has seen continued development with recent efforts focused on resolving a known limitation of deep-time palaeoclimate models--the 'cold-pole' paradox--in which simulated temperatures at higher latitudes were cooler than suggested by palaeoclimate proxy records [@lunt2021]. Improvements to the Cloud Condensation Nuclei formulation, cloud droplet effective radius [@kiehl2013], perturbed model parameters [@irvine2012], and a fix to a bug in Rayleigh scattering in the short-wave radiation scheme now produces warmer high latitudes, with minimal impact on the tropics, producing surface temperatures that are closer to proxy evidence [**REF -> Alex to add**]. Crucially, these changes are not state-dependant and can be applied across the range of warm and cool climates for the Phanerozoic, as well as producing a pre-industrial simulation that fits the observations [**REF -> Alex to add**]. Significantly, versions of this model have been used in a number of deep time ecological niche modelling applications [@waterson2016; @chiarenza2019; @saupe2019]. For each palaeoclimatic simulation, the model was run for over 7,000 years until each simulation reached equilibrium with both the atmosphere and deep ocean showing no significant trend, as well as less than 0.3 W/m2 energy imbalance at the top of the atmosphere. From these climate simulations, only the last 100 years is used to construct the mean of variables available in the model. In accordance with data from @foster2017, CO[2] concentrations were set to 590 (Santonian), 667 (Campanian), 261 (Maastrichtian) ppmv for climatic simulations. Three stage representative digital elevation models (Santonian, Campanian, and Maastrichtian) from the PALEOMAP project [@scotese2018] were used as the boundary conditions for climate simulations, providing spatially explicit approximations of Late Cretaceous continental configuration, topography, and bathymetry. Similarly, solar luminosity is also time specific for each reconstruction, and calculated following the methods of @gough1981. Furthermore, each simulation uses a modern orbital configuration (procession, obliquity, and eccentricity). For the purposes of this study, climate layers were downscaled to a horizontal resolution of 1º x 1º. Similar to previous simulation studies (e.g. @Saupe_2019), we focus on the maximum and minimum tolerances of species as they are components of the abiotic niche that are most likely sensitive to incomplete characterisation. As such, we calculated the maximum and minimum of temperature and precipitation from palaeoclimatic simulations (on a monthly cell-by-cell basis) to serve as inputs for our virtual-species simulations.
+
+## Virtual species simulations
+
+## Sampling masks
+
+## Niche comparisons
+
+## Geographic predictions and comparisons
+
+# Results
+
+## Virtual species and spatial sampling
+
+## Niche comparisons
+
+## Geographic comparisons
+
+# Discussion
+
+## Niche completeness
+
+## Spatial sampling and diversity
+
+## Pooling taxonomic level data
+
+## Model complexity
+
+## Regularization multiplier
+
+## Guidelines
+
+## Limitations
+
+# Conclusions
+
+# Acknowledgements
+
+# Author contributions
+
+LAJ, AAC, SV conceived and designed the project; LAJ performed the analyses; LAJ conducted the interpretation of the data; AF and PJV provided the GCM climate data; LAJ, AAC, EES, AF, and SV contributed to the writing of the manuscript; LAJ produced the figures.
+
+# Competing interests
+
+We declare we have no competing interests.
+
+# Data accessibility
+
+All electronic supplementary material and data have been included as part of the submission. All simulations and analyses were performed in R v. 4.0.3 and are available on GitHub (accessible via: <https://github.com/LewisAJones/NicheCompleteness>). Climate model simulations can be accessed at: <https://www.paleo.bristol.ac.uk/ummodel/scripts/papers/>.
+
+# Funding
+
+LAJ, AAC and SV were funded by the European Research Council under the European Union's Horizon 2020 research and innovation program (grant agreement 947921) as part of the MAPAS project. EES's contribution was supported by XXX... AF's contribution was supported by NERC grant NE/K014757/1 and NE/P013805/1. PJV's contribution was supported by XXX...
+
+# References

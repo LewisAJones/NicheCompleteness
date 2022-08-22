@@ -15,7 +15,7 @@ library(ggpubr)
 library(raster)
 library(rnaturalearth)
 library(rnaturalearthhires)
-library(viridis)
+library(MetBrewer)
 # Generate niche schematic -----------------------------------------------------
 # Set seed
 set.seed(5)
@@ -35,7 +35,7 @@ p1 <- ggplot() +
             aes(x = -1.4, y = 0.6, label = "N[P]"), size = 4, colour = "white", parse = TRUE) +
   xlab("PCA 1") + 
   ylab("PCA 2") +
-  scale_fill_viridis(begin = 0.1, end = 1, direction = 1, option = "D") +
+  scale_fill_met_c(name = "Hiroshige", direction = -1) +
   theme(legend.position = "none",
         panel.grid = element_blank(),
         panel.background = element_rect(fill = "white"),
@@ -46,7 +46,7 @@ p1 <- ggplot() +
         axis.line.y.left = element_line(size = 0.75, arrow = arrow(length = unit(3, "mm"))),
         axis.line.x.bottom = element_line(size = 0.75, arrow = arrow(length = unit(3, "mm")))) +
   coord_fixed()
-
+p1
 # Grab colours from plot for secondary plot
 b <- ggplot_build(p1)
 cols <- unique(b$data[[1]]["fill"])
