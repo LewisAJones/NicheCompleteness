@@ -36,7 +36,8 @@ p1 <- ggplot() +
   xlab("PCA 1") + 
   ylab("PCA 2") +
   scale_fill_met_c(name = "Hiroshige", direction = -1) +
-  theme(legend.position = "none",
+  theme(plot.margin = unit(c(0.25, 0.25, 0.25, 0.25), "cm"),
+        legend.position = "none",
         panel.grid = element_blank(),
         panel.background = element_rect(fill = "white"),
         axis.text = element_blank(),
@@ -53,14 +54,18 @@ cols <- unique(b$data[[1]]["fill"])
 # Generate geographic schematic ------------------------------------------------
 # Get Spain worldclim data
 wc <- raster("./data/raw-data/wc2-5/tmin6.bil")
+#wc <- resample(x = wc, y = raster(res = 0.1))
 # Get shapefile of Spain
 SPDF <- rnaturalearth::ne_countries(scale = 10, country = "spain")
 # Define extent for Spain
-e <- raster::extent(-10, 4, 35.5, 44)
+e <- raster::extent(-10, 3.5, 36, 44)
+# Define extent for Balearic Islands
+BI_e <- raster::extent(0.4, 5, 38, 40.3)
 # Crop and mask raster layer by extent and then shape
 ESP <- raster::crop(x = wc, y = e)
 ESP <- raster::mask(x = ESP, mask = SPDF)
 SPDF <- raster::crop(x = SPDF, y = e)
+BI <- raster::crop(x = SPDF, y = BI_e)
 # Set up rasters for different niche levels
 # Potential niche
 potential <- ESP
@@ -83,6 +88,7 @@ r <- as(r, "SpatialPixelsDataFrame")
 r <- as.data.frame(r)
 colnames(r) <- c("value", "x", "y")
 
+
 # Generate plot
 p2 <- ggplot() +  
   geom_polygon(data = SPDF, aes(x = long, y = lat, group = group), 
@@ -90,22 +96,25 @@ p2 <- ggplot() +
   geom_tile(data = r, aes(x = x, y = y, fill = as.factor(value), colour = as.factor(value))) + 
   geom_polygon(data = SPDF, aes(x = long, y = lat, group = group), 
                fill = NA, colour = "black", size = 0.25) +
+  geom_polygon(data = BI, aes(x = long, y = lat, group = group), 
+               fill = "white", colour = "black", size = 0.25) +
   scale_fill_manual(values = c(cols[1,], cols[3,], cols[4,]),
                     labels = c("Potential distribution", "Actual distribution", "Sampled distribution")) +
   scale_colour_manual(values = c(cols[1,], cols[3,], cols[4,]),
                     labels = c("Potential distribution", "Actual distribution", "Sampled distribution")) +
   coord_equal() +
   theme_map() +
-  theme(legend.position = c(0.65, 0.05),
+  theme(plot.margin = unit(c(0.25, 0, 0.25, 0), "cm"),
+        legend.position = c(0.75, 0.35),
         legend.title = element_blank(),
         legend.key.size = unit(3, "mm"),
         panel.background = element_rect(colour = "white"))
 
 # Build panel plot -------------------------------------------------------------
 # Build
-p <- ggarrange(p1, p2, labels = "AUTO")
+p <- ggarrange(p1, p2, labels = "AUTO", widths = c(1, 1.5))
 # Save
 ggsave("./figures/fig-1.jpg", units = "mm",
-       height = 80, width = 200, dpi = 600)
+       height = 80, width = 210, dpi = 600)
 
 

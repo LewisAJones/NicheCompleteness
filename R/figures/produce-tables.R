@@ -12,27 +12,8 @@
 library(ggplot2)
 library(gridExtra)
 library(raster)
-#-------------------------------------------------------------------------------
-# Simulation summary table
-# What intervals?
-intervals <- c("Santonian", "Campanian", "Maastrichtian")
-# Count number of species simulated
-simulated <- c(length(list.files("./results/virtual-species/sant/")),
-               length(list.files("./results/virtual-species/camp/")),
-               length(list.files("./results/virtual-species/maas/")))
-# Count number of species sampled
-sampled <- c(length(readRDS("./results/virtual-species/sampled/sant.RDS")),
-             length(readRDS("./results/virtual-species/sampled/camp.RDS")),
-             length(readRDS("./results/virtual-species/sampled/maas.RDS")))
-# Count number of species passing the threshold (n >= 5)
-threshold <- c(nrow(readRDS("./results/ecospat/sant.RDS"))/3,
-               nrow(readRDS("./results/ecospat/camp.RDS"))/3,
-               nrow(readRDS("./results/ecospat/maas.RDS"))/3)
-coverage <- NA
-extent <- NA
-
-# Bind data
-df <- cbind.data.frame(intervals, simulated, sampled, threshold, coverage, extent)
+# Simulation summary table -----------------------------------------------------
+df <- readRDS("./results/sampling-window/spatial-stats.RDS")
 # Assign col names for table
 colnames(df) <- c("Intervals",
                   "Simulated \n species (n)",
@@ -42,9 +23,9 @@ colnames(df) <- c("Intervals",
                   "Spatial sampling \n extent (km)")
 
 # Save
-jpeg("./figures/simulation_summary.jpg",
+jpeg("./figures/table-1.jpg",
      height=40, width=190, res = 300, units = "mm")
-p<-tableGrob(df, rows = NULL,
+p <- tableGrob(df, rows = NULL,
              theme = ttheme_default())
 grid.arrange(p)
 dev.off()

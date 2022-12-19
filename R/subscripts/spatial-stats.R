@@ -6,64 +6,81 @@
 ##
 ## Author: Dr Lewis Jones
 ##
-## Last updated: 2022-08-18
+## Last updated: 2022-08-23
 ##
 # Load packages ----------------------------------------------------------------
+library(raster)
 library(vegan)
-# ------------------------------------------------------------------------------
-# Spatial sampling coverage calculation
-sant <- raster("./results/sampling-window/sampling_raster_sant.grd")
-sant_samp <- sant
-sant[sant > 0] <- 0
-sant_samp[sant_samp == 0] <- NA
-sant_samp <- sum(
-  freq(sant_samp, useNA = 'no')[,c("count")]) / 
-  sum(freq(sant, useNA = 'no')[,c("count")])
+# Spatial sampling coverage calculation ----------------------------------------
+# Load rasters
+r <- stack(list.files("./results/sampling-window/", 
+                      pattern = ".grd", full.names = TRUE))
+# Assign names
+names(r) <- c("camp", "maas", "sant")
+# New object for binary sampling window
+r_samp <- r
+# Modify rasters for processing
+r[r > 0] <- 0
+r_samp[r_samp == 0] <- NA
+# Calculate coverage
+sant_samp <- sum(freq(r_samp$sant, useNA = 'no')[,c("count")]) / 
+  sum(freq(r$sant, useNA = 'no')[,c("count")])
 
-camp <- raster("./results/sampling-window/sampling_raster_camp.grd")
-camp_samp <- camp
-camp[camp > 0] <- 0
-camp_samp[camp_samp == 0] <- NA
-camp_samp <- sum(
-  freq(camp_samp, useNA = 'no')[,c("count")]) / 
-  sum(freq(camp, useNA = 'no')[,c("count")])
+camp_samp <- sum(freq(r_samp$camp, useNA = 'no')[,c("count")]) / 
+  sum(freq(r$camp, useNA = 'no')[,c("count")])
 
-maas <- raster("./results/sampling-window/sampling_raster_maas.grd")
-maas_samp <- maas
-maas[maas > 0] <- 0
-maas_samp[maas_samp == 0] <- NA
-maas_samp <- sum(
-  freq(maas_samp, useNA = 'no')[,c("count")]) / 
-  sum(freq(maas, useNA = 'no')[,c("count")])
+maas_samp <- sum(freq(r_samp$maas, useNA = 'no')[,c("count")]) / 
+  sum(freq(r$maas, useNA = 'no')[,c("count")])
 
-#bind data
-SC <- rbind.data.frame(sant_samp, camp_samp, maas_samp)
-#conver to percentages
-SC <- SC * 100
-#round data
-SC <- round(SC, digits = 2)
+# Bind data
+coverage <- data.frame(coverage = c(sant_samp, camp_samp, maas_samp))
+# Convert to percentages
+coverage <- coverage * 100
+# Round data
+coverage <- round(coverage, digits = 2)
 
-#spatial clustering
-r <- raster("./results/sampling-window/sampling_raster_sant.grd")
+# Spatial sampling extent ------------------------------------------------------
+# Load rasters
+r <- stack(list.files("./results/sampling-window/", 
+                      pattern = ".grd", full.names = TRUE))
+# Assign names
+names(r) <- c("camp", "maas", "sant")
+# Set non-sampled cells to NA
 r[r == 0] <- NA
-r <- rasterToPoints(r)[,c("x", "y")]
-gcdists <- pointDistance(r, lonlat = FALSE)
-mst_sp <- vegan::spantree(gcdists)
-MST <- sum(mst_sp$dist)/1000
-sant <- round(MST, digits = 0)
-
-r <- raster("./results/sampling-window/sampling_raster_camp.grd")
-r[r == 0] <- NA
-r <- rasterToPoints(r)[,c("x", "y")]
-gcdists <- pointDistance(r, lonlat = FALSE)
-mst_sp <- vegan::spantree(gcdists)
-MST <- sum(mst_sp$dist)/1000
-camp <- round(MST, digits = 0)
-
-r <- raster("./results/sampling-window/sampling_raster_maas.grd")
-r[r == 0] <- NA
-r <- rasterToPoints(r)[,c("x", "y")]
-gcdists <- pointDistance(r, lonlat = FALSE)
-mst_sp <- vegan::spantree(gcdists)
-MST <- sum(mst_sp$dist)/1000
-maas <- round(MST, digits = 0)
+# Convert to points
+# Empty dataframe
+extent <- data.frame()
+intervals <- c("sant", "camp", "maas")
+for (i in intervals) {
+  pts <- rasterToPoints(r[[i]])[,c("x", "y")]
+  # Calculate point distances
+  gcdists <- pointDistance(pts, lonlat = TRUE)
+  gcdists <- as.dist(gcdists)
+  # Calculate minimum spanning tree
+  mst_sp <- vegan::spantree(gcdists)
+  # Convert to km
+  MST <- sum(mst_sp$dist) / 1000
+  # Round off data
+  tmp <- round(MST, digits = 0)
+  # Bind data
+  extent <- rbind.data.frame(extent, tmp)
+}
+# Update column name
+colnames(extent) <- c("extent")
+# Bind data --------------------------------------------------------------------
+intervals <- c("Santonian", "Campanian", "Maastrichtian")
+# Count number of species simulated
+simulated <- c(length(list.files("./results/virtual-species/sant/")),
+               length(list.files("./results/virtual-species/camp/")),
+               length(list.files("./results/virtual-species/maas/")))
+# Count number of species sampled
+sampled <- c(length(readRDS("./results/virtual-species/sampled/sant.RDS")),
+             length(readRDS("./results/virtual-species/sampled/camp.RDS")),
+             length(readRDS("./results/virtual-species/sampled/maas.RDS")))
+# Count number of species passing the threshold (n >= 5)
+threshold <- c(nrow(readRDS("./results/ecospat/sant.RDS"))/3,
+               nrow(readRDS("./results/ecospat/camp.RDS"))/3,
+               nrow(readRDS("./results/ecospat/maas.RDS"))/3)
+df <- cbind.data.frame(intervals, simulated, sampled, threshold, coverage, extent)
+# Save data  -------------------------------------------------------------------
+saveRDS(df, "./results/sampling-window/spatial-stats.RDS")

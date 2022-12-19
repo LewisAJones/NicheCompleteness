@@ -1,4 +1,4 @@
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------#
 ##
 ## Script name: ecospat-analysis.R
 ##
@@ -6,21 +6,20 @@
 ##
 ## Author: Dr Lewis Jones
 ##
-## Last updated: 2022-08-17
+## Last updated: 2022-12-18
 ##
-# Load packages ----------------------------------------------------------------
+# Load packages -------------------------------------------------------------
 library(raster)
 library(ecospat)
+library(ade4)
 source("./R/options.R")
-# Remove all non-ecospat settings
-rm(list=ls()[-which(ls() == "ecospat_res")]) 
-# Generate directories ---------------------------------------------------------
+# Generate directories ------------------------------------------------------
 dir.create("./results/ecospat/", showWarnings = FALSE)
 dir.create("./results/ecospat/plots/", showWarnings = FALSE)
 dir.create("./results/ecospat/plots/sant/", showWarnings = FALSE)
 dir.create("./results/ecospat/plots/camp/", showWarnings = FALSE)
 dir.create("./results/ecospat/plots/maas/", showWarnings = FALSE)
-# Analyses ---------------------------------------------------------------------
+# Analyses ------------------------------------------------------------------
 # Define intervals
 intervals <- c("sant", "camp", "maas")
 # Run for loop across intervals
@@ -42,30 +41,37 @@ for (int in intervals) {
   for (i in species_files) {
     # Load data
     df <- readRDS(i)
-    # Minimum of five points needed for ecospat function
-    if (nrow(df$sampled_distribution) < 5) {
+    
+    # Minimum of five points needed for ecospat functionality
+    if (nrow(df$sampled_distribution_xy) < 5) {
       next
-      }
+    }
+    
     # Extract climate data for whole study area
     df$env <- na.omit(data.frame(getValues(stk)))
+    
     # Which cells are within potential distribution?
-    cells_potential <- Which(df$pa.raster == 1, cells = TRUE)
+    cells_potential <- Which(df$potential_ras == 1, cells = TRUE)
+    
     # Which cells are within the occupied distribution?
-    cells_dist <- cellFromXY(df$pa.raster, 
-                             xy = df$distribution[, c("x", "y")])
+    cells_occ <- cellFromXY(df$potential_ras, 
+                             xy = df$distribution_xy)
+    
     # Which cells are within the sampled distribution?
-    cells_samp <- cellFromXY(df$pa.raster, 
-                             xy = df$sampled_distribution[, c("x", "y")])
+    cells_samp <- cellFromXY(df$potential_ras, 
+                             xy = df$sampled_distribution_xy)
     
     # Extract climate data to points for potential distribution
     df$potential_env <- raster::extract(x = stk, y = cells_potential)
+    
     # Extract climate data to points for full distribution
-    df$full_env <- raster::extract(x = stk, y = cells_dist)
+    df$occuppied_env <- raster::extract(x = stk, y = cells_occ)
+    
     # Extract climate data to points for sampled distribution
     df$sampled_env <- raster::extract(x = stk, y = cells_samp)
     
     # Compute PCA for whole study area
-    pca.env <- ade4::dudi.pca(df$env,
+    pca_env <- ade4::dudi.pca(df$env,
                         center = TRUE,
                         scale = TRUE, 
                         scannf = FALSE, 
@@ -75,80 +81,80 @@ for (int in intervals) {
     #ecospat.plot.contrib(contrib=pca.env$co, eigen=pca.env$eig)
     
     # PCA scores for the whole study area
-    scores.globclim <- pca.env$li
-    
+    scores_globclim <- pca_env$li
+
     # Add potential distribution
-    scores.potential <- suprow(pca.env,df$potential_env)$li
+    scores_potential <- suprow(pca_env, df$potential_env)$li
     
     # Add occupied distribution
-    scores.full <- suprow(pca.env,df$full_env)$li
+    scores_occ <- suprow(pca_env, df$occuppied_env)$li
     
     # Add sampled distribution
-    scores.sampled <- suprow(pca.env,df$sampled_env)$li
+    scores_sampled <- suprow(pca_env, df$sampled_env)$li
     
     # Grid potential distribution niche
-    grid.clim.potential <- ecospat.grid.clim.dyn(
-      glob = scores.globclim, #entire globe available for background pixels
-      glob1 = scores.globclim, #entire globe available for background pixels
-      sp = scores.potential, #environmental values for species occurrences
-      R = ecospat_res, #resolution of grid
+    grid_clim_potential <- ecospat.grid.clim.dyn(
+      glob = scores_globclim, #entire globe available for background pixels
+      glob1 = scores_potential, #potential distribution is the background (known distribution)
+      sp = scores_potential, #environmental values for species occurrences
+      R = params$ecospat_res, #resolution of grid
       th.sp = 0, #do not exclude low species density values
       th.env = 0) #do not exclude low species density values
     
     # Grid occupied distribution niche
-    grid.clim.full <- ecospat.grid.clim.dyn(
-      glob = scores.globclim, #entire globe available for background pixels
-      glob1 = scores.potential, #potential area available for background pixels
-      sp = scores.full, #environmental values for species occurrences
-      R = ecospat_res, #resolution of grid
+    grid_clim_occ <- ecospat.grid.clim.dyn(
+      glob = scores_globclim, #entire globe available for background pixels
+      glob1 = scores_potential, #potential distribution available for background pixels
+      sp = scores_occ, #environmental values for species occurrences
+      R = params$ecospat_res, #resolution of grid
       th.sp = 0, #do not exclude low species density values
       th.env = 0) #do not exclude low species density values
     
     # Grid sampled distribution niche
-    grid.clim.samp <- ecospat.grid.clim.dyn(
-      glob = scores.globclim, #entire globe available for background pixels
-      glob1 = scores.full, #background pixels (available to sampled species)
-      sp = scores.sampled, #sampled environmental values
-      R = ecospat_res, #resolution of grid
+    grid_clim_samp <- ecospat.grid.clim.dyn(
+      glob = scores_globclim, #entire globe available for background pixels
+      glob1 = scores_occ, #occupied distribution available for background pixels
+      sp = scores_sampled, #sampled environmental values
+      R = params$ecospat_res, #resolution of grid
       th.sp = 0, #do not exclude low species density values
       th.env = 0) #do not exclude low species density values
     
     # Quantify niche dynamics
     # Potential and occupied distribution
-    niche.dyn.potential.full <- ecospat.niche.dyn.index(
-      z1 = grid.clim.potential, 
-      z2= grid.clim.full, 
+    niche_dyn_potential_occ <- ecospat.niche.dyn.index(
+      z1 = grid_clim_potential, 
+      z2 = grid_clim_occ, 
       intersection = NA)
     # Potential and sampled distribution
-    niche.dyn.potential.sampled <- ecospat.niche.dyn.index(
-      z1 = grid.clim.potential, 
-      z2 = grid.clim.samp,
+    niche_dyn_potential_sampled <- ecospat.niche.dyn.index(
+      z1 = grid_clim_potential, 
+      z2 = grid_clim_samp,
       intersection = NA)
     # Occupied and sampled distribution
-    niche.dyn.full.sampled <- ecospat.niche.dyn.index(
-      z1 = grid.clim.full, 
-      z2 = grid.clim.samp, 
+    niche_dyn_occ_sampled <- ecospat.niche.dyn.index(
+      z1 = grid_clim_occ, 
+      z2 = grid_clim_samp, 
       intersection = NA)
     
     # Extract niche dynamics metric
-    df <- t(data.frame(niche.dyn.potential.full$dynamic.index.w,
-                       niche.dyn.potential.sampled$dynamic.index.w,
-                       niche.dyn.full.sampled$dynamic.index.w))
+    df <- t(data.frame(niche_dyn_potential_occ$dynamic.index.w,
+                       niche_dyn_potential_sampled$dynamic.index.w,
+                       niche_dyn_occ_sampled$dynamic.index.w))
     df <- data.frame(df)
    
     # Calculate and add centroid distance
-    x1 <- cbind(median(scores.potential[, 1]), median(scores.potential[, 2]))
-    x2 <- cbind(median(scores.full[, 1]), median(scores.full[, 2]))
-    x3 <- cbind(median(scores.sampled[, 1]), median(scores.sampled[, 2]))
-    centroid.potential.full <- as.numeric(sqrt(rowSums((x1 - x2)^2)))
-    centroid.potential.sampled <- as.numeric(sqrt(rowSums((x1 - x3)^2)))
-    centroid.full.sampled <- as.numeric(sqrt(rowSums((x2 - x3)^2)))
+    x1 <- cbind(median(scores_potential[, 1]), median(scores_potential[, 2]))
+    x2 <- cbind(median(scores_occ[, 1]), median(scores_occ[, 2]))
+    x3 <- cbind(median(scores_sampled[, 1]), median(scores_sampled[, 2]))
+    centroid_potential_occ <- as.numeric(sqrt(rowSums((x1 - x2)^2)))
+    centroid_potential_sampled <- as.numeric(sqrt(rowSums((x1 - x3)^2)))
+    centroid_occ_sampled <- as.numeric(sqrt(rowSums((x2 - x3)^2)))
     
     # Format data
-    df$centroid <- c(centroid.potential.full,
-                     centroid.potential.sampled,
-                     centroid.full.sampled)
-    df$comparison <- c("potential_full", "potential_sampled", "full_sampled")
+    df$centroid <- c(centroid_potential_occ,
+                     centroid_potential_sampled,
+                     centroid_occ_sampled)
+    df$comparison <- c("potential_occupied", "potential_sampled", "occupied_sampled")
     
     # Add species name
     species <- tools::file_path_sans_ext(basename(i))
@@ -165,7 +171,7 @@ for (int in intervals) {
     png(paste0("./results/ecospat/plots/", int, "/species-", species, ".png"),
         width = 150,  height = 150, units = "mm", res = 300)
     
-    ecospat.plot.niche.dyn(grid.clim.full, grid.clim.samp,
+    ecospat.plot.niche.dyn(grid_clim_occ, grid_clim_samp,
                            quant = 0, interest = 2, 
                            title = tools::file_path_sans_ext(basename(i)), 
                            name.axis1 = "PCA-1", 
@@ -175,10 +181,10 @@ for (int in intervals) {
     #                        scores.globclim, scores.globclim)
     dev.off()
     #Sys.sleep(1)
+    ecospat_df <- ecospat_df[order(ecospat_df$species),]
   }
-  ecospat_df <- ecospat_df[order(ecospat_df$species),]
   saveRDS(object = ecospat_df, file = paste0("./results/ecospat/", int, ".RDS"))
 }
 
-# FINISH -----------------------------------------------------------------------
-beepr::beep(sound = 2)
+# Finish ------------------------------------------------------------------
+beepr::beep(sound = 4)

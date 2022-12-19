@@ -12,7 +12,7 @@
 library(raster)
 library(dismo)
 library(ENMTools)
-library(pbmcapply)
+library(rJava)
 #use CESGA
 #setwd("/mnt/netapp2/Store_uni/home/uvi/ba/ljo/NicheCompleteness/")
 source("./R/functions/binary-overlap.R")
@@ -20,7 +20,7 @@ source("./R/functions/binary-overlap.R")
 # Create directory
 dir.create("./results/dismo/", showWarnings = FALSE)
 # Define intervals
-intervals <- c("camp", "maas")  
+intervals <- c("sant", "camp", "maas")  
 # Run for loop across intervals
 for (int in intervals) {
   # Get species that have been sampled and have more than 5 occurrences
@@ -38,7 +38,7 @@ for (int in intervals) {
   stk <- stack(files)
   
   # Sample globe for bg points (reduces influence of varying background)
-  bg.points <- data.frame(rasterToPoints(stk, spatial = FALSE)[, c("x", "y")])
+  bg_points <- data.frame(rasterToPoints(stk, spatial = FALSE)[, c("x", "y")])
   
   # Generate ENMs and run overlap tests
   overlap <- lapply(species_files, function(i){
@@ -50,112 +50,119 @@ for (int in intervals) {
     species <- tools::file_path_sans_ext(basename(i))
     
     # Format to enmtools.species object to maintain consistent format
-    species_full <- enmtools.species(
+    species_occ <- enmtools.species(
       species.name = species,
-      presence.points = df$distribution,
-      background.points = bg.points)
+      presence.points = df$distribution_xy,
+      background.points = bg_points)
     # Check species
-    species_full <- check.species(species_full)
+    species_occ <- check.species(species_occ)
     
     # Format to enmtools.species object to maintain consistent format
     species_sampled <- enmtools.species(
       species.name = species,
-      presence.points = df$sampled_distribution,
-      background.points = bg.points)
+      presence.points = df$sampled_distribution_xy,
+      background.points = bg_points)
     # Check species
     species_sampled <- check.species(species_sampled)
+    
     #----- Generate BIOCLIM models -----
-    # Generate model for full distribution
-    species_full.bc <- dismo::bioclim(x = stk, 
-                                      p = species_full$presence.points)
+    # Generate model for occ distribution
+    species_occ_bc <- dismo::bioclim(x = stk, 
+                                      p = species_occ$presence.points)
     # Get prediction from model
-    species_full.bc.suitability <- dismo::predict(
-      object = species_full.bc, 
-      x = stk)
+    species_occ_bc_suitability <- dismo::predict(object = species_occ_bc,
+                                                  x = stk)
 
     # Convert to binary predictions (any value more than 0 is suitable in
-    # climate envelope model)
-    LPT <- min(
-      raster::extract(x = species_full.bc.suitability,
-              y = species_full$presence.points))
-    species_full.bc.suitability[species_full.bc.suitability >= LPT] <- 1
-    species_full.bc.suitability[species_full.bc.suitability < 1] <- 0
+    # a BIOCLIM model)
+    LPT <- min(raster::extract(x = species_occ_bc_suitability,
+                               y = species_occ$presence.points))
+    species_occ_bc_suitability[species_occ_bc_suitability >= LPT] <- 1
+    species_occ_bc_suitability[species_occ_bc_suitability < 1] <- 0
     
     # Generate model for sampled distribution
-    species_sampled.bc <- dismo::bioclim(x = stk, 
+    species_sampled_bc <- dismo::bioclim(x = stk, 
                                          p = species_sampled$presence.points)
     # Get prediction from model
-    species_sampled.bc.suitability <- dismo::predict(
-      object = species_sampled.bc,
-      x = stk)
+    species_sampled_bc_suitability <- dismo::predict(object = species_sampled_bc,
+                                                     x = stk)
+    
     # Convert to binary predictions (any value more than 0 is suitable in
-    # climate envelope model)
-    LPT <- min(
-      raster::extract(x = species_sampled.bc.suitability,
-              y = species_sampled$presence.points))
-    species_sampled.bc.suitability[species_sampled.bc.suitability >= LPT] <- 1
-    species_sampled.bc.suitability[species_sampled.bc.suitability < 1] <- 0
+    # a BIOCLIM model)
+    LPT <- min(raster::extract(x = species_sampled_bc_suitability,
+                               y = species_sampled$presence.points))
+    species_sampled_bc_suitability[species_sampled_bc_suitability >= LPT] <- 1
+    species_sampled_bc_suitability[species_sampled_bc_suitability < 1] <- 0
+    
     #----- Generate MAXENT models -----
-    # Generate model for full distribution
-    species_full.mx <- dismo::maxent(x = stk,
-                                     p = species_full$presence.points,
-                                     a = species_full$background.points)
+    # Generate model for occ distribution
+    species_occ_mx <- dismo::maxent(x = stk,
+                                     p = species_occ$presence.points,
+                                     a = species_occ$background.points)
     # Get prediction from model
-    species_full.mx.suitability <- dismo::predict(object = species_full.mx,
+    species_occ_mx_suitability <- dismo::predict(object = species_occ_mx,
                                                   x = stk)
     # Get LPT threshold
-    LPT <- min(raster::extract(x = species_full.mx.suitability,
-                         y = species_full$presence.points))
+    LPT <- min(raster::extract(x = species_occ_mx_suitability,
+                               y = species_occ$presence.points))
     # Apply threshold
-    species_full.mx.suitability[species_full.mx.suitability >= LPT] <- 1
-    species_full.mx.suitability[species_full.mx.suitability < 1] <- 0
+    species_occ_mx_suitability[species_occ_mx_suitability >= LPT] <- 1
+    species_occ_mx_suitability[species_occ_mx_suitability < 1] <- 0
     
     # Generate model for sampled distribution
-    species_sampled.mx <- dismo::maxent(x = stk,
+    species_sampled_mx <- dismo::maxent(x = stk,
                                         p = species_sampled$presence.points,
-                                        a = species_full$background.points)
+                                        a = species_occ$background.points)
     # Get prediction from model
-    species_sampled.mx.suitability <- dismo::predict(
-      object = species_sampled.mx,
-      x = stk)
+    species_sampled_mx_suitability <- dismo::predict(object = species_sampled_mx,
+                                                     x = stk)
     
     # Get LPT threshold
-    LPT <- min(raster::extract(x = species_sampled.mx.suitability,
+    LPT <- min(raster::extract(x = species_sampled_mx_suitability,
                                y = species_sampled$presence.points))
     # Apply threshold
-    species_sampled.mx.suitability[species_sampled.mx.suitability >= LPT] <- 1
-    species_sampled.mx.suitability[species_sampled.mx.suitability < 1] <- 0
+    species_sampled_mx_suitability[species_sampled_mx_suitability >= LPT] <- 1
+    species_sampled_mx_suitability[species_sampled_mx_suitability < 1] <- 0
     
     #----- Calculate overlap between each model -----
     # Calculate binary overlap
-    bin_over <- rbind(
-      binary_overlap(x = df$pa.raster,
-                     y = species_full.bc.suitability),
-      binary_overlap(x = df$pa.raster,
-                     y = species_sampled.bc.suitability),
-      binary_overlap(x = df$ras_distribution,
-                     y = species_full.bc.suitability),
-      binary_overlap(x = df$ras_distribution,
-                     y = species_sampled.bc.suitability),
-      binary_overlap(x = df$pa.raster,
-                     y = species_full.mx.suitability),
-      binary_overlap(x = df$pa.raster,
-                     y = species_sampled.mx.suitability),
-      binary_overlap(x = df$ras_distribution,
-                     y = species_full.mx.suitability),
-      binary_overlap(x = df$ras_distribution,
-                     y = species_sampled.mx.suitability)
-      )
-    # Bind data and format
+    
+    # BIOCLIM
+    BIOCLIM <- rbind.data.frame(
+    # potential vs occupied distribution
+    binary_overlap(x = df$potential_ras, y = species_occ_bc_suitability),
+    # potential vs sampled distribution
+    binary_overlap(x = df$potential_ras, y = species_sampled_bc_suitability),
+    # known occupied distribution vs modeled occupied distribution
+    binary_overlap(x = df$distribution_ras, y = species_occ_bc_suitability),
+    # known occupied distribution vs sampled distribution
+    binary_overlap(x = df$distribution_ras, y = species_sampled_bc_suitability)
+    )
+    
+    # MAXENT
+    MAXENT <- rbind.data.frame(
+      # potential vs occupied distribution
+      binary_overlap(x = df$potential_ras, y = species_occ_mx_suitability),
+      # potential vs sampled distribution
+      binary_overlap(x = df$potential_ras, y = species_sampled_mx_suitability),
+      # known occupied distribution vs modeled occupied distribution
+      binary_overlap(x = df$distribution_ras, y = species_occ_mx_suitability),
+      # known occupied distribution vs sampled distribution
+      binary_overlap(x = df$distribution_ras, y = species_sampled_mx_suitability)
+    )
+    
+    # Bind data
+    bin_over <- rbind.data.frame(BIOCLIM, MAXENT)
+    
+    # Add data columns
     bin_over$model <- rep(x = c("BIOCLIM", "MAXENT"), times = 1, each = 4)
-    bin_over$comparison <- rep(x = c("potential_full",
-                                     "potential_sampled",
-                                     "occupied_full",
-                                     "occupied_sample"), times = 2, each = 1)
+    bin_over$known <- rep(x = c("potential", "occupied"), times = 2, each = 2)
+    bin_over$predicted <- rep(x = c("occupied", "sampled"), times = 4, each = 1)
+
     bin_over$species <- species
     bin_over$n <- nrow(df$distribution)
     bin_over$n_samp <- nrow(df$sampled_distribution)
-    cat("species", species)
+    cat(message(paste0(species, " complete.")))
     # Return data
     return(bin_over)
   })
