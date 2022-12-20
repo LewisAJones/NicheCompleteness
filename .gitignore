@@ -10,8 +10,7 @@
 .DS_Store
 .DS_Store?
 ._*
-CESGA/
-results/virtual-species/
-results/ecospat/
-README.html
+CESGA
+figures
+results
 manuscript
