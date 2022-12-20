@@ -23,16 +23,16 @@
 setwd("/mnt/netapp2/Store_uni/home/uvi/ba/ljo/NicheCompleteness/")
 
 # Prepare climate data
-source("./R/subscripts/prepare-climate-data.R")
-rm(list = ls())
+#source("./R/subscripts/prepare-climate-data.R")
+#rm(list = ls())
 
 # Prepare fossil sampling windows
-source("./R/subscripts/sampling-window.R")
-rm(list = ls())
+#source("./R/subscripts/sampling-window.R")
+#rm(list = ls())
 
 # Generate distance matrices
-source("./R/subscripts/distance-matrix-gen.R")
-rm(list = ls())
+#source("./R/subscripts/distance-matrix-gen.R")
+#rm(list = ls())
 
 # Generate virtual species
 source("./R/subscripts/virtual-species-gen.R")
