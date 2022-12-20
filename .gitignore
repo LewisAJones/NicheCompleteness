@@ -4,13 +4,14 @@
 .Ruserdata
 .DS_Store
 .RDataTmp
-
+*.icloud
+*.DS_Store
+*.Rhistory
 .DS_Store
 .DS_Store?
 ._*
-
 CESGA/
 results/virtual-species/
 results/ecospat/
 README.html
-
+manuscript
