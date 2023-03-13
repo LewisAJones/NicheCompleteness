@@ -1,19 +1,16 @@
-## -----------------------------------------------------------------------------
-##
-## Script name: fig-3.R
-##
-## Purpose of script: plot sampled climate
-##
-## Author: Dr Lewis Jones
-##
-## Lasted updated: 2022-08-23
-##
-# Load packages ----------------------------------------------------------------
-library(MetBrewer)
+# -----------------------------------------------------------------------
+# Project: NicheCompleteness
+# File name: fig-3.R
+# Last updated: 2023-02-23
+# Author: Lewis A. Jones
+# Email: LewisA.Jones@outlook.com
+# Repository: https://github.com/LewisAJones/NicheCompleteness
+# Load libraries --------------------------------------------------------
+library(RColorBrewer)
 library(ggplot2)
 # Set-up -----------------------------------------------------------------------
 # Colours for plotting
-cols <- met.brewer(name = "Hiroshige", n = 5, type = "discrete")
+cols <- RColorBrewer::brewer.pal(n = 5, name = "Blues")
 # Read data
 df <- readRDS("./results/climate/sampled-climate.RDS")
 # Plot -------------------------------------------------------------------------
@@ -23,7 +20,7 @@ temp <- ggplot(data = df, aes(x = min_temp, y = max_temp, colour = sampled, shap
     xlab("Minimum temperature (ºC)") +
     ylab("Maximum temperature (ºC)") +
     scale_color_manual(values=c(cols[2], cols[5])) +
-    scale_shape_manual(values=c(17, 19)) +
+    scale_shape_manual(values=c(17, 16)) +
     facet_wrap(~interval) +
     theme(plot.background = element_rect(colour = NA, fill = "white"),
           panel.background = element_blank(),
@@ -35,15 +32,16 @@ temp <- ggplot(data = df, aes(x = min_temp, y = max_temp, colour = sampled, shap
           panel.border = element_rect(colour = "black", fill = NA),
           legend.position = c(0.06, 0.1),
           legend.background = element_rect(fill = NA, colour = NA),
-          legend.text = element_text(size = 10),
+          legend.text = element_text(size = 12),
           legend.spacing.x = unit(0.05, 'cm'),
           legend.title = element_blank(),
-          legend.key=element_blank(),
+          legend.key = element_blank(),
           axis.text = element_text(size = 12, angle = 0, hjust = 0.5),
           axis.title = element_text(size = 14, face = "bold", vjust = 0),
           strip.text = element_text(size = 12, face = "bold"),
+          strip.background = element_blank(),
           aspect.ratio = 1)
-temp <- temp + guides(colour = guide_legend(override.aes = list(size=2.5)))
+temp <- temp + guides(colour = guide_legend(override.aes = list(size=3.5)))
 
 #plot precipitation  
 prec <- ggplot(data = df, aes(x = min_precip, y = max_precip, colour = sampled, shape = sampled)) + 
@@ -51,7 +49,7 @@ prec <- ggplot(data = df, aes(x = min_precip, y = max_precip, colour = sampled, 
   xlab("Minimum precipitation (mm/day)") +
   ylab("Maximum precipitation (mm/day)") +
   scale_color_manual(values=c(cols[2], cols[5])) +
-  scale_shape_manual(values=c(17, 19)) +
+  scale_shape_manual(values=c(17, 16)) +
   facet_wrap(~interval) +
   theme(plot.background = element_rect(colour = NA, fill = "white"),
     panel.background = element_blank(),
@@ -63,18 +61,19 @@ prec <- ggplot(data = df, aes(x = min_precip, y = max_precip, colour = sampled, 
     panel.border = element_rect(colour = "black", fill = NA),
     legend.position = c(0.94, 0.9),
     legend.background = element_rect(fill = NA, colour = NA),
-    legend.text = element_text(size = 10),
+    legend.text = element_text(size = 12),
     legend.spacing.x = unit(0.05, 'cm'),
     legend.title = element_blank(),
     legend.key=element_blank(),
     axis.text = element_text(size = 12, angle = 0, hjust = 0.5),
     axis.title = element_text(size = 14, face = "bold", vjust = 0),
     strip.text = element_text(size = 12, face = "bold"),
+    strip.background = element_blank(),
     aspect.ratio = 1)
-prec <- prec + guides(colour = guide_legend(override.aes = list(size=2.5)))
+prec <- prec + guides(colour = guide_legend(override.aes = list(size=3.5)))
 #---------------------------------
 #arrange and save
 p <- ggpubr::ggarrange(temp, prec, nrow = 2, labels = "AUTO", align = "v",
                          font.label = list(size = 20))
-#p <- ggpubr::ggarrange(temp, prec, nrow = 2, align = "v")
-ggsave("./figures/fig-3.jpg", height = 120, width = 150, units = "mm", dpi = 600, scale = 1.75)
+ggsave("./figures/fig-3.png", height = 120, width = 150, 
+       units = "mm", dpi = 600, scale = 1.75, bg = "white")

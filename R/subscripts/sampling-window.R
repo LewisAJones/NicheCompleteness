@@ -42,22 +42,22 @@ collections <- collections[, c("lng", "lat", "interval")]
 # Reduce to unique instances for sampling window
 collections <- unique(collections)
 # Add age of plate rotation model used for palaeoDEMs (Scotese & Wright, 2018)
-collections$rot_age <- NA
-collections[which(collections$interval == "sant"),c("rot_age")] <- 85
-collections[which(collections$interval == "camp"),c("rot_age")] <- 80
-collections[which(collections$interval == "maas"),c("rot_age")] <- 70
+collections$age <- NA
+collections[which(collections$interval == "sant"),c("age")] <- 85
+collections[which(collections$interval == "camp"),c("age")] <- 80
+collections[which(collections$interval == "maas"),c("age")] <- 70
 # Rotate data---------------------------------------------------------------
 collections <- palaeorotate(occdf = collections,
                             lng = "lng",
                             lat = "lat",
-                            age = "rot_age",
+                            age = "age",
                             method = "point",
                             model = "PALEOMAP")
 
 # Drop collections without coordinates
 collections <- collections[-which(is.na(collections$p_lat)), ]
 # Save data
-for(i in intervals){
+for (i in intervals) {
   # Subset data
   xy <- subset(collections, interval == i)
   # Save xy data

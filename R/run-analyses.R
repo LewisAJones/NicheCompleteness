@@ -11,7 +11,7 @@
 # Set-up ------------------------------------------------------------------
 ## Vector of required packages
 #pkgs <- c("ade4", "dismo", "dplyr", "ecospat", "ENMTools", "geosphere", 
-#          "ncdf4", "palaeoverse", "pbmcapply", "raster", "rJava", "stringr")
+#          "ncdf4", "palaeoverse", "pbmcapply", "terra", "rJava", "stringr")
 ## Install required packages
 #install.packages(pkgs)
 ## Check if all packages are installed
@@ -19,20 +19,21 @@
 ## Load packages
 #lapply(pkgs, require, character.only = TRUE)
 # Analyses-------------------------------------------------------------------
-# Update working directory if using CESGA
-setwd("/mnt/netapp2/Store_uni/home/uvi/ba/ljo/NicheCompleteness/")
-
 # Prepare climate data
-#source("./R/subscripts/prepare-climate-data.R")
-#rm(list = ls())
+source("./R/subscripts/prepare-climate-data.R")
+rm(list = ls())
 
 # Prepare fossil sampling windows
-#source("./R/subscripts/sampling-window.R")
-#rm(list = ls())
+source("./R/subscripts/sampling-window.R")
+rm(list = ls())
+
+# Sample climate data
+source("./R/subscripts/sample-climate-data.R")
+rm(list = ls())
 
 # Generate distance matrices
-#source("./R/subscripts/distance-matrix-gen.R")
-#rm(list = ls())
+source("./R/subscripts/distance-matrix-gen.R")
+rm(list = ls())
 
 # Generate virtual species
 source("./R/subscripts/virtual-species-gen.R")
@@ -46,11 +47,11 @@ rm(list = ls())
 source("./R/subscripts/richness-calc.R")
 rm(list = ls())
 
-#run ecospat analyses
+# Run ecospat analyses
 source("./R/subscripts/ecospat-analysis.R")
 rm(list = ls())
 
-##run dismo analyses
+# Run dismo analyses
 source("./R/subscripts/dismo-analysis.R")
 rm(list = ls())
 
@@ -62,3 +63,11 @@ rm(list = ls())
 
 #source("./R/figures/fig-2.R")
 #rm(list = ls())
+
+# Generate plot of climate sampling
+source("./R/figures/fig-3.R")
+rm(list = ls())
+
+# Generate richness maps
+source("./R/figures/richness-maps.R")
+rm(list = ls())

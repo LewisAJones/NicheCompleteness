@@ -1,24 +1,19 @@
-## ----------------------------------------------------------------------##
-##
-## Script name: distance-matrix-gen.R
-##
-## Purpose of script: Generate distance matrix
-##
-## Author: Dr Lewis Jones
-##
-## Last update: 2022-12-17
-##
-## ----------------------------------------------------------------------##
-# Load packages -----------------------------------------------------------
-library(raster)
+# -----------------------------------------------------------------------
+# Project: NicheCompleteness
+# File name: distance-matrix-gen.R
+# Last updated: 2023-02-25
+# Author: Lewis A. Jones
+# Email: LewisA.Jones@outlook.com
+# Repository: https://github.com/LewisAJones/NicheCompleteness
+# Load libraries --------------------------------------------------------
+library(terra)
 library(geosphere)
+source("./R/options.R")
 # Generate directory
 dir.create("./data/distances/", showWarnings = FALSE)
-# Simulation ---------------------------------------------------------------
-#intervals for analyses
-intervals <- c("sant", "camp", "maas")
+# Simulation ------------------------------------------------------------
 #run for loop across intervals
-for (int in intervals) {
+for (int in params$stage) {
   # Load data ----------------------------------------------------------------
   
   # Create directory
@@ -26,10 +21,10 @@ for (int in intervals) {
   
   # Get file paths
   files <- list.files(paste0("./data/climate/", int, "/"), 
-                      pattern = ".grd", full.names = TRUE)
+                      pattern = ".tiff", full.names = TRUE)
   
   # Stack rasters
-  stk <- raster::stack(files)
+  stk <- terra::rast(files)
   
   # Create background raster
   background <- stk$max_precip
@@ -39,13 +34,10 @@ for (int in intervals) {
   # Generate distance matrix ----------------------------------------------
   
   # Convert raster to xy
-  xy <- as.data.frame(background, xy = TRUE)
+  xy <- as.data.frame(background, xy = TRUE, na.rm = TRUE)
   
   # Extract cell indexes
   xy$cell <- cellFromXY(object = background, xy = xy[, c("x", "y")])
-  
-  # Remove ocean cells (NAs)
-  xy <- xy[-which(is.na(xy$land)), ]
   
   # Calculate distance matrix (this takes a while as it is global, but saves
   # repeating this step for each species saving computational time in the end)

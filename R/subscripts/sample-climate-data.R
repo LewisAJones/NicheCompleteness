@@ -1,86 +1,56 @@
-## -----------------------------------------------------------------------------
-##
-## Script name: sample-climate-data.R
-##
-## Purpose of script: sample available climate data
-##
-## Author: Dr Lewis Jones
-##
-## Lasted updated: 2022-08-23
-##
-# Load packages ----------------------------------------------------------------
-library(raster)
-# Santonian --------------------------------------------------------------------
-# Stack climate rasters
-sant <- stack(list.files(paste0("./data/climate/sant/"), 
-                         pattern = ".grd", full.names = TRUE))
-# Load sampling window
-sant_samp <- raster("./results/sampling-window/sampling_raster_sant.grd")
-# Set non-sampled values to NA for masking
-sant_samp[sant_samp == 0] <- NA
-# Extract sampled values
-sant_samp <- mask(x = sant, mask = sant_samp)
-# Remove sampled values (for plotting)
-sant <- mask(x = sant, mask = sant_samp, inverse = TRUE)
-# Convert to dataframes
-sant <- as.data.frame(x = sant, xy = TRUE, na.rm = TRUE)
-sant_samp <- as.data.frame(x = sant_samp, xy = TRUE, na.rm = TRUE)
-# Add sampled status
-sant$sampled <- "Available"
-sant_samp$sampled <- "Sampled"
-# Bind data
-sant <- rbind.data.frame(sant, sant_samp)
-# Add interval
-sant$interval <- "Santonian"
-# Campanian --------------------------------------------------------------------
-# Stack climate rasters
-camp <- stack(list.files(paste0("./data/climate/camp/"), 
-                         pattern = ".grd", full.names = TRUE))
-# Load sampling window
-camp_samp <- raster("./results/sampling-window/sampling_raster_camp.grd")
-# Set non-sampled values to NA for masking
-camp_samp[camp_samp == 0] <- NA
-# Extract sampled values
-camp_samp <- mask(x = camp, mask = camp_samp)
-# Remove sampled values (for plotting)
-camp <- mask(x = camp, mask = camp_samp, inverse = TRUE)
-# Convert to dataframes
-camp <- as.data.frame(x = camp, xy = TRUE, na.rm = TRUE)
-camp_samp <- as.data.frame(x = camp_samp, xy = TRUE, na.rm = TRUE)
-# Add sampled status
-camp$sampled <- "Available"
-camp_samp$sampled <- "Sampled"
-# Bind data
-camp <- rbind.data.frame(camp, camp_samp)
-# Add interval
-camp$interval <- "Campanian"
-# Maastrichtian ----------------------------------------------------------------
-# Stack climate rasters
-maas <- stack(list.files(paste0("./data/climate/maas/"), 
-                         pattern = ".grd", full.names = TRUE))
-# Load sampling window
-maas_samp <- raster("./results/sampling-window/sampling_raster_maas.grd")
-# Set non-sampled values to NA for masking
-maas_samp[maas_samp == 0] <- NA
-# Extract sampled values
-maas_samp <- mask(x = maas, mask = maas_samp)
-# Remove sampled values (for plotting)
-maas <- mask(x = maas, mask = maas_samp, inverse = TRUE)
-# Convert to dataframes
-maas <- as.data.frame(x = maas, xy = TRUE, na.rm = TRUE)
-maas_samp <- as.data.frame(x = maas_samp, xy = TRUE, na.rm = TRUE)
-# Add sampled status
-maas$sampled <- "Available"
-maas_samp$sampled <- "Sampled"
-# Bind data
-maas <- rbind.data.frame(maas, maas_samp)
-# Add interval
-maas$interval <- "Maastrichtian"
-
-#bind data
-df <- rbind.data.frame(sant, camp, maas)
+# -----------------------------------------------------------------------
+# Project: NicheCompleteness
+# File name: sample-climate-data.R
+# Last updated: 2023-02-25
+# Author: Lewis A. Jones
+# Email: LewisA.Jones@outlook.com
+# Repository: https://github.com/LewisAJones/NicheCompleteness
+# Load libraries --------------------------------------------------------
+library(dplyr)
+library(terra)
+library(geosphere)
+source("./R/options.R")
+# -----------------------------------------------------------------------
+# Create emtpy dataframe
+df <- data.frame()
+for (i in params$stage) { 
+  # Stack climate rasters
+  stk <- rast(list.files(paste0("./data/climate/", i), 
+                           pattern = ".tiff", full.names = TRUE))
+  # Load sampling window
+  sampling_window <- readRDS(paste0("./results/sampling-window/xy_coords_",
+                                    i,
+                                    ".RDS"))[, c("p_lng", "p_lat")]
+  # Convert raster to sf
+  xy <- as.data.frame(stk, xy = TRUE)[, c("x", "y")]
+  # Extract points based on buffer distance
+  dist_m <- distm(x = sampling_window,
+                  y = xy, fun = distGeo)
+  # Get column indexes (i.e. xy coordinates)
+  col_ids <- unique(which(dist_m <= params$buffer, arr.ind = TRUE)[, "col"])
+  # Extract climate data
+  full <- terra::extract(x = stk, y = xy, df = TRUE)
+  full$sampled <- "Available"
+  # Subset sampled points
+  xy <- xy[col_ids, ]
+  # Extract climate data
+  sampled <- raster::extract(x = stk, y = xy, df = TRUE)
+  sampled$sampled <- "Sampled"
+  # Bind data
+  full <- rbind.data.frame(full, sampled)
+  # Add interval
+  full$interval <- i
+  # Bind to df
+  df <- rbind.data.frame(df, full)
+}
+# Update names
+df[which(df$interval == "sant"), c("interval")] <- c("Santonian")
+df[which(df$interval == "camp"), c("interval")] <- c("Campanian")
+df[which(df$interval == "maas"), c("interval")] <- c("Maastrichtian")
 df$interval = factor(df$interval, 
                      levels=c("Santonian", "Campanian", "Maastrichtian"))
-# Save -------------------------------------------------------------------------
+# Save ---------------------------------------------------------------------
 dir.create("./results/climate", showWarnings = FALSE)
 saveRDS(df, "./results/climate/sampled-climate.RDS")
+# Finish -------------------------------------------------------------------
+beepr::beep(sound = 4)

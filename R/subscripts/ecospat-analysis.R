@@ -10,6 +10,8 @@
 ##
 # Load packages -------------------------------------------------------------
 library(raster)
+library(terra)
+library(biomod2)
 library(ecospat)
 library(ade4)
 source("./R/options.R")
@@ -20,15 +22,13 @@ dir.create("./results/ecospat/plots/sant/", showWarnings = FALSE)
 dir.create("./results/ecospat/plots/camp/", showWarnings = FALSE)
 dir.create("./results/ecospat/plots/maas/", showWarnings = FALSE)
 # Analyses ------------------------------------------------------------------
-# Define intervals
-intervals <- c("sant", "camp", "maas")
 # Run for loop across intervals
-for (int in intervals) {
+for (int in params$stage) {
   # Get climate file paths
   files <- list.files(paste0("./data/climate/", int, "/"),
-                      pattern = ".grd", full.names = TRUE)
+                      pattern = ".tiff", full.names = TRUE)
   # Stack rasters
-  stk <- stack(files)
+  stk <- rast(files)
   
   # Get species file paths 
   species_files <- readRDS(
@@ -48,18 +48,20 @@ for (int in intervals) {
     }
     
     # Extract climate data for whole study area
-    df$env <- na.omit(data.frame(getValues(stk)))
+    df$env <- terra::values(stk, na.rm = TRUE)
     
     # Which cells are within potential distribution?
-    cells_potential <- Which(df$potential_ras == 1, cells = TRUE)
+    pot_xy <- df$potential_xy
+    pot_xy <- pot_xy[which(pot_xy$layer == 1), c("x", "y")]
+    cells_potential <- cellFromXY(object = stk, xy = pot_xy)
     
     # Which cells are within the occupied distribution?
-    cells_occ <- cellFromXY(df$potential_ras, 
-                             xy = df$distribution_xy)
+    dist_xy <- df$distribution_xy
+    dist_xy <- dist_xy[which(dist_xy$layer == 1), c("x", "y")]
+    cells_occ <- cellFromXY(object = stk, xy = dist_xy)
     
     # Which cells are within the sampled distribution?
-    cells_samp <- cellFromXY(df$potential_ras, 
-                             xy = df$sampled_distribution_xy)
+    cells_samp <- cellFromXY(object = stk, xy = df$sampled_distribution_xy)
     
     # Extract climate data to points for potential distribution
     df$potential_env <- raster::extract(x = stk, y = cells_potential)
@@ -95,7 +97,7 @@ for (int in intervals) {
     # Grid potential distribution niche
     grid_clim_potential <- ecospat.grid.clim.dyn(
       glob = scores_globclim, #entire globe available for background pixels
-      glob1 = scores_potential, #potential distribution is the background (known distribution)
+      glob1 = scores_globclim, #entire globe available for background pixels
       sp = scores_potential, #environmental values for species occurrences
       R = params$ecospat_res, #resolution of grid
       th.sp = 0, #do not exclude low species density values

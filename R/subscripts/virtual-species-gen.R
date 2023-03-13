@@ -10,7 +10,7 @@
 ##
 ## ----------------------------------------------------------------------##
 # Load packages -----------------------------------------------------------
-library(raster)
+library(terra)
 library(geosphere)
 library(pbmcapply)
 # Update working directory if using CESGA
@@ -22,10 +22,8 @@ source("./R/functions/binary-ras.R")
 # Generate directory
 dir.create("./results/virtual-species/", showWarnings = FALSE)
 # Simulation ---------------------------------------------------------------
-#intervals for analyses
-intervals <- c("sant", "camp", "maas")
 #run for loop across intervals
-for (int in intervals) {
+for (int in params$stage) {
 # Load data ----------------------------------------------------------------
   
   # Create directory
@@ -33,10 +31,10 @@ for (int in intervals) {
   
   # Get file paths
   files <- list.files(paste0("./data/climate/", int, "/"), 
-                      pattern = ".grd", full.names = TRUE)
+                      pattern = ".tiff", full.names = TRUE)
   
   # Stack rasters
-  stk <- raster::stack(files)
+  stk <- terra::rast(files)
   
   # Create background raster
   background <- stk$max_precip
@@ -48,11 +46,11 @@ for (int in intervals) {
 
 # Generate seeds ----------------------------------------------------------
   # Convert to dataframe
-  seeds <- raster::as.data.frame(x = stk, xy = TRUE, na.rm = TRUE)
+  seeds <- terra::as.data.frame(x = stk, xy = TRUE, na.rm = TRUE)
   # Extract cell indexes
-  cells <- cellFromXY(object = stk, seeds[, c("x", "y")])
+  cells <- terra::cellFromXY(object = stk, seeds[, c("x", "y")])
   # Get cell area for each cell
-  area <- area(x = stk)[cells]
+  area <- terra::cellSize(x = background)[cells]
   # Bind data
   seeds <- cbind.data.frame(cells, area, seeds)
   
@@ -110,14 +108,12 @@ for (int in intervals) {
                                        tmp$temp,
                                      upper = tmp$min_temp + 
                                        tmp$temp),
-                     max_precip = list(lower = tmp$max_precip - 
-                                         (tmp$max_precip * tmp$precip),
-                                       upper = tmp$max_precip + 
-                                         (tmp$max_precip * tmp$precip)),
-                     min_precip = list(lower = tmp$min_precip - 
-                                         (tmp$min_precip * tmp$precip),
-                                       upper = tmp$min_precip + 
-                                         (tmp$min_precip * tmp$precip)))
+                     max_precip = list(lower = (tmp$max_precip * tmp$precip) - 
+                                         tmp$max_precip,
+                                       upper = tmp$max_precip * tmp$precip),
+                     min_precip = list(lower = (tmp$min_precip * tmp$precip) -
+                                         tmp$min_precip,
+                                       upper = tmp$min_precip * tmp$precip))
 
     # Generate potential distribution
     potential_ras <- binary_ras(x = stk$max_temp,
@@ -140,9 +136,7 @@ for (int in intervals) {
     dispersal_steps <- sample(x = 0:tmp$disp,
                               size = params$burn_in,
                               replace = TRUE,
-                              prob = dweibull(x = 0:tmp$disp,
-                                              shape = 1,
-                                              scale = 1E5))
+                              prob = dexp(x = 0:tmp$disp, rate = params$rate))
     
     # Filter non-dispersal steps (less than the minimum distance between cells)
     min_val <- min(dist_m, na.rm = TRUE)
@@ -155,7 +149,7 @@ for (int in intervals) {
     for (i in seq_along(disp)) {
       
       # Which cells are occupied?
-      occ_cells <- as.character(Which(x = dist_ras, 1))
+      occ_cells <- as.character(unlist(cells(x = dist_ras, y = 1)))
       
       # Sample one population for dispersal
       occ_cells <- sample(occ_cells, size = 1)
@@ -183,14 +177,14 @@ for (int in intervals) {
           Sys.sleep(0.1)
       }
     }
+    # Potential xy
+    potential_xy <- terra::as.data.frame(potential_ras, xy = TRUE, na.rm = FALSE)
     # Distribution xy
-    dist_xy <- as.data.frame(rasterToPoints(dist_ras))
-    # Retain only xy data for presences
-    dist_xy <- dist_xy[which(dist_xy$land == 1), c("x", "y")]
+    names(dist_ras) <- c("layer")
+    dist_xy <- terra::as.data.frame(dist_ras, xy = TRUE, na.rm = FALSE)
     # Generate list
     tmp <- list(species_id = tmp$species_id,
                 seed_cell = tmp$cells,
-                seed_ras = seed_ras,
                 seed_xy = cbind.data.frame(tmp[, c("x", "y")]),
                 seed_vals = cbind.data.frame(tmp[, c("max_temp",
                                                      "min_temp",
@@ -198,10 +192,9 @@ for (int in intervals) {
                                                      "min_precip")]),
                 niche_type = tmp[, c("niche")],
                 niche_tolerances = tolerances,
-                potential_ras = potential_ras,
                 dispersal_type = tmp[, c("dispersal")],
                 dispersal_steps = dispersal_steps,
-                distribution_ras = dist_ras,
+                potential_xy = potential_xy,
                 distribution_xy = dist_xy
                 )
     saveRDS(tmp, paste0("./results/virtual-species/", int, "/species-", x, ".RDS"))

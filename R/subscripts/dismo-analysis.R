@@ -13,16 +13,13 @@ library(raster)
 library(dismo)
 library(ENMTools)
 library(rJava)
-#use CESGA
-#setwd("/mnt/netapp2/Store_uni/home/uvi/ba/ljo/NicheCompleteness/")
+source("./R/options.R")
 source("./R/functions/binary-overlap.R")
 # Analyses ---------------------------------------------------------------------
 # Create directory
 dir.create("./results/dismo/", showWarnings = FALSE)
-# Define intervals
-intervals <- c("sant", "camp", "maas")  
 # Run for loop across intervals
-for (int in intervals) {
+for (int in params$stage) {
   # Get species that have been sampled and have more than 5 occurrences
   species <- unique(readRDS(paste0("./results/ecospat/", int, ".RDS"))$species)
   # Get species files
@@ -32,13 +29,13 @@ for (int in intervals) {
                           species, ".RDS")
   # Get interval climate data
   files <- list.files(paste0("./data/climate/", int),
-                      pattern = ".grd", full.names = TRUE)
+                      pattern = ".tiff", full.names = TRUE)
   
-  # Stack rasters
-  stk <- stack(files)
+  # Raster stack required for dismo
+  stk <- raster::stack(files)
   
   # Sample globe for bg points (reduces influence of varying background)
-  bg_points <- data.frame(rasterToPoints(stk, spatial = FALSE)[, c("x", "y")])
+  bg_points <- as.data.frame(stk, xy = TRUE, df = TRUE, na.rm = TRUE)[, c("x", "y")]
   
   # Generate ENMs and run overlap tests
   overlap <- lapply(species_files, function(i){
@@ -52,7 +49,7 @@ for (int in intervals) {
     # Format to enmtools.species object to maintain consistent format
     species_occ <- enmtools.species(
       species.name = species,
-      presence.points = df$distribution_xy,
+      presence.points = df$distribution_xy[which(df$distribution_xy$layer == 1), c("x", "y")],
       background.points = bg_points)
     # Check species
     species_occ <- check.species(species_occ)
@@ -60,7 +57,7 @@ for (int in intervals) {
     # Format to enmtools.species object to maintain consistent format
     species_sampled <- enmtools.species(
       species.name = species,
-      presence.points = df$sampled_distribution_xy,
+      presence.points = df$sampled_distribution_xy[, c("x", "y")],
       background.points = bg_points)
     # Check species
     species_sampled <- check.species(species_sampled)
@@ -68,10 +65,10 @@ for (int in intervals) {
     #----- Generate BIOCLIM models -----
     # Generate model for occ distribution
     species_occ_bc <- dismo::bioclim(x = stk, 
-                                      p = species_occ$presence.points)
+                                     p = species_occ$presence.points)
     # Get prediction from model
     species_occ_bc_suitability <- dismo::predict(object = species_occ_bc,
-                                                  x = stk)
+                                                 x = stk)
 
     # Convert to binary predictions (any value more than 0 is suitable in
     # a BIOCLIM model)
@@ -126,29 +123,46 @@ for (int in intervals) {
     
     #----- Calculate overlap between each model -----
     # Calculate binary overlap
+    # create potential ras
+    potential_ras <- raster::raster(res = params$res, vals = NA)
+    bg <- cellFromXY(object = potential_ras,
+                     xy = df$potential_xy[which(df$potential_xy$layer == 0), c("x", "y")])
+    pot <- cellFromXY(object = potential_ras,
+                      xy = df$potential_xy[which(df$potential_xy$layer == 1), c("x", "y")])
+    potential_ras[bg] <- 0
+    potential_ras[pot] <- 1
+    
+    # create distribution ras
+    distribution_ras <- raster::raster(res = params$res, vals = NA)
+    bg <- cellFromXY(object = distribution_ras,
+                     xy = df$distribution_xy[which(df$distribution_xy$layer == 0), c("x", "y")])
+    dist <- cellFromXY(object = distribution_ras,
+                       xy = df$distribution_xy[which(df$distribution_xy$layer == 1), c("x", "y")])
+    distribution_ras[bg] <- 0
+    distribution_ras[dist] <- 1
     
     # BIOCLIM
     BIOCLIM <- rbind.data.frame(
     # potential vs occupied distribution
-    binary_overlap(x = df$potential_ras, y = species_occ_bc_suitability),
+    binary_overlap(x = potential_ras, y = species_occ_bc_suitability),
     # potential vs sampled distribution
-    binary_overlap(x = df$potential_ras, y = species_sampled_bc_suitability),
+    binary_overlap(x = potential_ras, y = species_sampled_bc_suitability),
     # known occupied distribution vs modeled occupied distribution
-    binary_overlap(x = df$distribution_ras, y = species_occ_bc_suitability),
+    binary_overlap(x = distribution_ras, y = species_occ_bc_suitability),
     # known occupied distribution vs sampled distribution
-    binary_overlap(x = df$distribution_ras, y = species_sampled_bc_suitability)
+    binary_overlap(x = distribution_ras, y = species_sampled_bc_suitability)
     )
     
     # MAXENT
     MAXENT <- rbind.data.frame(
       # potential vs occupied distribution
-      binary_overlap(x = df$potential_ras, y = species_occ_mx_suitability),
+      binary_overlap(x = potential_ras, y = species_occ_mx_suitability),
       # potential vs sampled distribution
-      binary_overlap(x = df$potential_ras, y = species_sampled_mx_suitability),
+      binary_overlap(x = potential_ras, y = species_sampled_mx_suitability),
       # known occupied distribution vs modeled occupied distribution
-      binary_overlap(x = df$distribution_ras, y = species_occ_mx_suitability),
+      binary_overlap(x = distribution_ras, y = species_occ_mx_suitability),
       # known occupied distribution vs sampled distribution
-      binary_overlap(x = df$distribution_ras, y = species_sampled_mx_suitability)
+      binary_overlap(x = distribution_ras, y = species_sampled_mx_suitability)
     )
     
     # Bind data
@@ -160,7 +174,7 @@ for (int in intervals) {
     bin_over$predicted <- rep(x = c("occupied", "sampled"), times = 4, each = 1)
 
     bin_over$species <- species
-    bin_over$n <- nrow(df$distribution)
+    bin_over$n <- sum(df$distribution_xy$layer == 1, na.rm = TRUE)
     bin_over$n_samp <- nrow(df$sampled_distribution)
     cat(message(paste0(species, " complete.")))
     # Return data

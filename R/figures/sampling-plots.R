@@ -1,19 +1,22 @@
-## ---------------------------
-##
-## Script name: sampling-window.R
-##
-## Purpose of script: sampling window plot
-##
-## Author: Dr Lewis Jones
-##
-## Date Created: 2022-03-23
-##
-## Copyright (c) Lewis Jones, 2022
-## Email: LewisA.Jones@outlook.com
-##
-#---------Load packages-----------
+# -----------------------------------------------------------------------
+# Project: NicheCompleteness
+# File name: sampling-plots.R
+# Last updated: 2023-02-23
+# Author: Lewis A. Jones
+# Email: LewisA.Jones@outlook.com
+# Repository: https://github.com/LewisAJones/NicheCompleteness
+# Load libraries --------------------------------------------------------
+library(ggplot2)
 library(raster)
-source("./R/options.R")
+# Generate plot ---------------------------------------------------------
+
+
+tmp <- raster(res = 0.2)
+intervals <- c("sant", "camp", "maas")
+r <- raster("./data/climate/sant/max_precip.tiff")
+r[!is.na(r)] <- 1
+r <- resample(x = r, y = tmp)
+plot(r)
 #---------------------------------
 #sampling windows
 sant_samp <- raster("./results/sampling-window/sampling_raster_sant.grd")

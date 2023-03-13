@@ -18,11 +18,11 @@ df <- data.frame(Interval = rep(c("Santonian", "Campanian", "Maastrichtian"), ea
 
 # Calculate stats for unfilling for full vs sampled distribution
 sant <- readRDS("./results/ecospat/sant.RDS")
-sant <- subset(sant, comparison == "full_sampled")
+sant <- subset(sant, comparison == "occupied_sampled")
 camp <- readRDS("./results/ecospat/camp.RDS")
-camp <- subset(camp, comparison == "full_sampled")
+camp <- subset(camp, comparison == "occupied_sampled")
 maas <- readRDS("./results/ecospat/maas.RDS")
-maas <- subset(maas, comparison == "full_sampled")
+maas <- subset(maas, comparison == "occupied_sampled")
 
 mean_unfilling <- c(mean(sant$unfilling),
                     mean(camp$unfilling),

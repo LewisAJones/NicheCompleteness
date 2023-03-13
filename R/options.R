@@ -26,13 +26,16 @@ params <- list(
   # Dispersal capacity in m
   disp_opt = list(good_disp = 4E5,
                   poor_disp = 2E5),
+  # Rate for exponential decay curve (sampling dispersal)
+  # This value is small as the working units is metres
+  rate = 0.15E-4,
   # Niche options (temperature values and multiplier precipitation values)  
   niche_opt = list(broad_niche = list(temp = 10, precip = 1.5),
                    narrow_niche = list(temp = 5, precip = 1.25)),
-  # Buffer zone radius for sampling (unit in m)
-  buffer = 5E4,
-  # Plot outputs?
-  plot_output = FALSE,
+  # Rate for sampling dispersal  # Buffer zone radius for sampling (unit in m)
+  buffer = 1E5,
   # Ecospat res
-  ecospat_res = 1000
+  ecospat_res = 100,
+  # Plot outputs?
+  plot_output = FALSE
 )
