@@ -1,15 +1,11 @@
-## ----------------------------------------------------------------------##
-##
-## Script name: prepare-climate-data.R
-##
-## Purpose of script: Prepare climate data
-##
-## Author: Dr Lewis Jones
-##
-## Last update: 2022-12-17
-##
-## ----------------------------------------------------------------------##
-# Load packages -----------------------------------------------------------
+# Header ----------------------------------------------------------------
+# Project: NicheCompleteness
+# File name: prepare-climate-data.R
+# Last updated: 2023-03-16
+# Author: Lewis A. Jones
+# Email: LewisA.Jones@outlook.com
+# Repository: https://github.com/LewisAJones/NicheCompleteness
+# Load packages ---------------------------------------------------------
 library(terra)
 library(ncdf4)
 library(stringr)
@@ -17,7 +13,7 @@ library(geosphere)
 source("./R/options.R")
 # Create directory for data
 dir.create("./data/climate/", showWarnings = FALSE)
-# Data preparation --------------------------------------------------------
+# Data preparation ------------------------------------------------------
 # Grab months and convert to lowercase
 months <- c(tolower(month.abb))
 # Generate raster template
@@ -72,5 +68,5 @@ for (i in params$stage) {
     filename = paste0(out_dir, names(stk), ".tiff"), 
     overwrite = TRUE)
 }
-# Finish ------------------------------------------------------------------
+# Finish -----------------------------------------------------------------
 beepr::beep(sound = 4)

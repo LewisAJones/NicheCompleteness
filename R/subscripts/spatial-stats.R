@@ -1,7 +1,7 @@
-# -----------------------------------------------------------------------
+# Header ----------------------------------------------------------------
 # Project: NicheCompleteness
 # File name: spatial-stats.R
-# Last updated: 2023-02-23
+# Last updated: 2023-03-29
 # Author: Lewis A. Jones
 # Email: LewisA.Jones@outlook.com
 # Repository: https://github.com/LewisAJones/NicheCompleteness

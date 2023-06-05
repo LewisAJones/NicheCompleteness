@@ -1,17 +1,14 @@
-## -------------------------------------------------------------------------#
-##
-## Script name: richness_calc.R
-##
-## Purpose of script: richness maps
-##
-## Author: Dr Lewis Jones
-##
-## Last updated: 2022-12-18
-##
-# Load packages--------------------------------------------------------------
+# Header ----------------------------------------------------------------
+# Project: NicheCompleteness
+# File name: richness-calc.R
+# Last updated: 2023-03-16
+# Author: Lewis A. Jones
+# Email: LewisA.Jones@outlook.com
+# Repository: https://github.com/LewisAJones/NicheCompleteness
+# Load packages----------------------------------------------------------
 library(terra)
 source("./R/options.R")
-# Run script-----------------------------------------------------------------
+# Run script-------------------------------------------------------------
 # Create directory
 dir.create("./results/virtual-species/richness/", showWarnings = FALSE)
 # Run for loop over intervals
@@ -53,7 +50,7 @@ for (i in params$stage) {
   writeRaster(r, paste0(od, "_distribution.tiff"), 
               overwrite = TRUE)
   
-  # Sampled distribution diversity ------------------------------------------
+  # Sampled distribution diversity ---------------------------------------
   # Reset background
   r[r > 0] <- 0
   # For loop (add all species distributions for diversity map)
@@ -67,5 +64,5 @@ for (i in params$stage) {
   writeRaster(r, paste0(od, "_sampled.tiff"), 
               overwrite = TRUE)
 }
-# Finish --------------------------------------------------------------------
+# Finish -----------------------------------------------------------------
 beepr::beep(sound = 4)

@@ -1,24 +1,11 @@
-##--------------------------------------------------------------------------#
-##
-## Script name: run-analysis.R
-##
-## Purpose of script: runs analysis
-##
-## Author: Dr Lewis Jones
-##
-## Date Created: 2022-12-19
-##
-# Set-up ------------------------------------------------------------------
-## Vector of required packages
-#pkgs <- c("ade4", "dismo", "dplyr", "ecospat", "ENMTools", "geosphere", 
-#          "ncdf4", "palaeoverse", "pbmcapply", "terra", "rJava", "stringr")
-## Install required packages
-#install.packages(pkgs)
-## Check if all packages are installed
-#pkgs %in% .packages(all.available = TRUE)
-## Load packages
-#lapply(pkgs, require, character.only = TRUE)
-# Analyses-------------------------------------------------------------------
+# Header ----------------------------------------------------------------
+# Project: NicheCompleteness
+# File name: run-analyses.R
+# Last updated: 2023-03-16
+# Author: Lewis A. Jones
+# Email: LewisA.Jones@outlook.com
+# Repository: https://github.com/LewisAJones/NicheCompleteness
+# Analyses---------------------------------------------------------------
 # Prepare climate data
 source("./R/subscripts/prepare-climate-data.R")
 rm(list = ls())
@@ -51,23 +38,33 @@ rm(list = ls())
 source("./R/subscripts/ecospat-analysis.R")
 rm(list = ls())
 
-# Run dismo analyses
-source("./R/subscripts/dismo-analysis.R")
+# Summarise ecospat analyses
+source("./R/subscripts/ecospat-summary.R")
+rm(list = ls())
+
+# Run predicts analyses
+source("./R/subscripts/predicts-analysis.R")
+rm(list = ls())
+
+# Summarise predicts analyses
+source("./R/subscripts/predicts-summary.R")
 rm(list = ls())
 
 # Figures-----------------------------------------------------------------------
-
-# Generate figures
-#source("./R/figures/fig-1.R")
-#rm(list = ls())
-
-#source("./R/figures/fig-2.R")
-#rm(list = ls())
-
-# Generate plot of climate sampling
-source("./R/figures/fig-3.R")
+source("./R/figures/niche-schematic.R")
 rm(list = ls())
 
-# Generate richness maps
-source("./R/figures/richness-maps.R")
+source("./R/figures/study-site.R")
+rm(list = ls())
+
+source("./R/figures/sampled-climate.R")
+rm(list = ls())
+
+source("./R/figures/ecospat-violin.R")
+rm(list = ls())
+
+source("./R/figures/predicts-violin.R")
+rm(list = ls())
+
+source("./R/figures/confusion-matrix.R")
 rm(list = ls())

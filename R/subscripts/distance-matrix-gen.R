@@ -14,7 +14,7 @@ dir.create("./data/distances/", showWarnings = FALSE)
 # Simulation ------------------------------------------------------------
 #run for loop across intervals
 for (int in params$stage) {
-  # Load data ----------------------------------------------------------------
+  # Load data -----------------------------------------------------------
   
   # Create directory
   dir.create(paste0("./data/distances/", int), showWarnings = FALSE)

@@ -1,15 +1,11 @@
-## ----------------------------------------------------------------------##
-##
-## Script name: virtual-species-gen.R
-##
-## Purpose of script: Generate virtual species
-##
-## Author: Dr Lewis Jones
-##
-## Last update: 2022-12-17
-##
-## ----------------------------------------------------------------------##
-# Load packages -----------------------------------------------------------
+# Header ----------------------------------------------------------------
+# Project: NicheCompleteness
+# File name: virtual-species-gen.R
+# Last updated: 2023-03-16
+# Author: Lewis A. Jones
+# Email: LewisA.Jones@outlook.com
+# Repository: https://github.com/LewisAJones/NicheCompleteness
+# Load packages ---------------------------------------------------------
 library(terra)
 library(geosphere)
 library(pbmcapply)
@@ -21,10 +17,10 @@ source("./R/options.R")
 source("./R/functions/binary-ras.R")
 # Generate directory
 dir.create("./results/virtual-species/", showWarnings = FALSE)
-# Simulation ---------------------------------------------------------------
+# Simulation ------------------------------------------------------------
 #run for loop across intervals
 for (int in params$stage) {
-# Load data ----------------------------------------------------------------
+# Load data -------------------------------------------------------------
   
   # Create directory
   dir.create(paste0("./results/virtual-species/", int), showWarnings = FALSE)
@@ -198,8 +194,8 @@ for (int in params$stage) {
                 distribution_xy = dist_xy
                 )
     saveRDS(tmp, paste0("./results/virtual-species/", int, "/species-", x, ".RDS"))
-  }, mc.cores = detectCores()-1, mc.preschedule = FALSE, mc.cleanup = TRUE))
+  }, mc.cores = params$cores, mc.preschedule = FALSE, mc.cleanup = TRUE))
 }
 
-# Finish -----------------------------------------------------------------------
+# Finish -----------------------------------------------------------------
 beepr::beep(sound = 4)

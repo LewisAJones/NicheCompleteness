@@ -1,21 +1,19 @@
-## -----------------------------------------------------------------------------
-##
-## Script name: dismo-analysis.R
-##
-## Purpose of script: generate ecological niche models and perform tests
-##
-## Author: Dr Lewis Jones
-##
-## Last updated: 2022-08-18
-##
-# Load packages ----------------------------------------------------------------
-library(raster)
+# Header ----------------------------------------------------------------
+# Project: NicheCompleteness
+# File name: dismo-analysis.R
+# Last updated: 2023-03-16
+# Author: Lewis A. Jones
+# Email: LewisA.Jones@outlook.com
+# Repository: https://github.com/LewisAJones/NicheCompleteness
+# Load packages ---------------------------------------------------------
+library(terra)
 library(dismo)
 library(ENMTools)
 library(rJava)
 source("./R/options.R")
 source("./R/functions/binary-overlap.R")
-# Analyses ---------------------------------------------------------------------
+int <- "sant"
+# Analyses --------------------------------------------------------------
 # Create directory
 dir.create("./results/dismo/", showWarnings = FALSE)
 # Run for loop across intervals
@@ -32,10 +30,10 @@ for (int in params$stage) {
                       pattern = ".tiff", full.names = TRUE)
   
   # Raster stack required for dismo
-  stk <- raster::stack(files)
+  stk <- terra::rast(files)
   
   # Sample globe for bg points (reduces influence of varying background)
-  bg_points <- as.data.frame(stk, xy = TRUE, df = TRUE, na.rm = TRUE)[, c("x", "y")]
+  bg_points <- terra::as.data.frame(x = stk$max_precip, xy = TRUE)[,c("x", "y")]
   
   # Generate ENMs and run overlap tests
   overlap <- lapply(species_files, function(i){

@@ -8,13 +8,13 @@ binary_overlap <- function(x, y){
   # Binary calculations for the confusion matrix
   
   # True positives (cells in x and y are equal to 1)
-  TP <- length(Which((x + y) == 2, cells = TRUE))
+  TP <- length(cells(x = (x + y), y = 2)[[1]])
   # False positive (cells in x are 0 and cells in y are 1)
-  FP <- length(Which((x - y) == -1, cells = TRUE))
+  FP <- length(cells(x = (x - y), y = -1)[[1]])
   # True negative (cells in x and y have a value of 0)
-  TN <- length(Which((x + y) == 0, cells = TRUE))
+  TN <- length(cells(x = (x + y), y = 0)[[1]])
   # False negative (cells in y are 0 and cells in x are 1)
-  FN <- length(Which((y - x) == -1, cells = TRUE))
+  FN <- length(cells(x = (y - x), y = -1)[[1]])
   
 
   # TPR: TP/TP+FN

@@ -1,20 +1,17 @@
-## -------------------------------------------------------------------------#
-##
-## Script name: sample-data.R
-##
-## Purpose of script: sample species' distributions
-##
-## Author: Dr Lewis Jones
-##
-## Last updated: 2022-12-17
-##
-# Load packages--------------------------------------------------------------
+# Header ----------------------------------------------------------------
+# Project: NicheCompleteness
+# File name: sample-data.R
+# Last updated: 2023-03-16
+# Author: Lewis A. Jones
+# Email: LewisA.Jones@outlook.com
+# Repository: https://github.com/LewisAJones/NicheCompleteness
+# Load packages----------------------------------------------------------
 library(dplyr)
 library(terra)
 library(geosphere)
 library(pbmcapply)
 source("./R/options.R")
-# Analyses-------------------------------------------------------------------
+# Analyses---------------------------------------------------------------
 # Create directory
 dir.create("./results/virtual-species/sampled/", showWarnings = FALSE)
 # Counter for how many species unsampled
@@ -65,7 +62,7 @@ for (i in params$stage) {
   saveRDS(indx, paste0("./results/virtual-species/sampled/", i, ".RDS"))
   n <- n + length(indx)
 }
-# Finish --------------------------------------------------------------------
+# Finish -----------------------------------------------------------------
 message(paste0("There are ", n, " out of ",
              (params$n_species)*length(params$stage),
 " species sampled."))

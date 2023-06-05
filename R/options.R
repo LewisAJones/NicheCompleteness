@@ -11,6 +11,8 @@
 ##-----------------------------------------------------------------------##
 # Define parameters -------------------------------------------------------
 params <- list(
+  # Cores (how many cores should be used for the simulations)?
+  cores = 7,
   # Stages
   stage = c("sant", "camp", "maas"),
   # Raster resolution
@@ -30,9 +32,9 @@ params <- list(
   # This value is small as the working units is metres
   rate = 0.15E-4,
   # Niche options (temperature values and multiplier precipitation values)  
-  niche_opt = list(broad_niche = list(temp = 10, precip = 1.5),
-                   narrow_niche = list(temp = 5, precip = 1.25)),
-  # Rate for sampling dispersal  # Buffer zone radius for sampling (unit in m)
+  niche_opt = list(broad_niche = list(temp = 15, precip = 1.5),
+                   narrow_niche = list(temp = 7.5, precip = 1.25)),
+  # Buffer zone radius for sampling (unit in m)
   buffer = 1E5,
   # Ecospat res
   ecospat_res = 100,

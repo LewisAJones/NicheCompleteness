@@ -1,27 +1,24 @@
-## -------------------------------------------------------------------------#
-##
-## Script name: ecospat-analysis.R
-##
-## Purpose of script: run tests for niche unfilling & centroid distance
-##
-## Author: Dr Lewis Jones
-##
-## Last updated: 2022-12-18
-##
-# Load packages -------------------------------------------------------------
+# Header ----------------------------------------------------------------
+# Project: NicheCompleteness
+# File name: ecospat-analysis.R
+# Last updated: 2023-03-16
+# Author: Lewis A. Jones
+# Email: LewisA.Jones@outlook.com
+# Repository: https://github.com/LewisAJones/NicheCompleteness
+# Load packages ---------------------------------------------------------
 library(raster)
 library(terra)
 library(biomod2)
 library(ecospat)
 library(ade4)
 source("./R/options.R")
-# Generate directories ------------------------------------------------------
+# Generate directories --------------------------------------------------
 dir.create("./results/ecospat/", showWarnings = FALSE)
 dir.create("./results/ecospat/plots/", showWarnings = FALSE)
 dir.create("./results/ecospat/plots/sant/", showWarnings = FALSE)
 dir.create("./results/ecospat/plots/camp/", showWarnings = FALSE)
 dir.create("./results/ecospat/plots/maas/", showWarnings = FALSE)
-# Analyses ------------------------------------------------------------------
+# Analyses --------------------------------------------------------------
 # Run for loop across intervals
 for (int in params$stage) {
   # Get climate file paths
@@ -188,5 +185,5 @@ for (int in params$stage) {
   saveRDS(object = ecospat_df, file = paste0("./results/ecospat/", int, ".RDS"))
 }
 
-# Finish ------------------------------------------------------------------
+# Finish ----------------------------------------------------------------
 beepr::beep(sound = 4)
